@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>JP Professional Interest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#022c4f; --navy2:#003763; --blue:#0067B1; --cyan:#00C9D4;
+    --orange:#E1523D; --silver:#C7D0D8; --ink:#EAF2F8; --muted:#89A4BB;
+    --fdisplay:'Space Grotesk',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --fmono:'Space Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --fbody:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;margin:0}
+  body{
+    font-family:var(--fbody); color:var(--ink); overflow:hidden;
+    background:
+      radial-gradient(1200px 800px at 50% -10%, #0a4a7a33, transparent 60%),
+      radial-gradient(900px 700px at 110% 120%, #00c9d41f, transparent 55%),
+      linear-gradient(160deg, #01243f 0%, var(--navy) 45%, var(--navy2) 100%);
+    background-attachment:fixed;
+  }
+  body::before{ /* faint circuit grid */
+    content:""; position:fixed; inset:0; pointer-events:none; opacity:.35;
+    background-image:
+      linear-gradient(#0a4a7a22 1px, transparent 1px),
+      linear-gradient(90deg, #0a4a7a22 1px, transparent 1px);
+    background-size:44px 44px; mask-image:radial-gradient(circle at 50% 40%, #000 40%, transparent 85%);
+  }
+  .wrap{position:fixed; inset:0; display:flex; flex-direction:column}
+  /* top bar */
+  .bar{display:flex; align-items:center; justify-content:space-between; padding:14px 18px; gap:12px}
+  .readouts{display:flex; gap:16px; align-items:center}
+  .ro{ text-align:right; line-height:1 }
+  .ro .k{font-family:var(--fmono); font-size:10px; letter-spacing:.12em; color:var(--muted); text-transform:uppercase}
+  .ro .v{font-family:var(--fmono); font-weight:700; font-size:20px; color:var(--ink); margin-top:4px}
+  .ro .v.cyan{color:var(--cyan)} .ro .v.orange{color:var(--orange)}
+  /* node strip */
+  .node{padding:0 18px; display:flex; align-items:center; gap:12px}
+  .node .lbl{font-family:var(--fdisplay); font-weight:700; font-size:15px; letter-spacing:.02em}
+  .node .yr{font-family:var(--fmono); color:var(--cyan); font-size:13px}
+  .node .task{font-size:12.5px; color:var(--muted)}
+  .node .task b{color:#cfe2f0; font-weight:600}
+  /* timer */
+  .timerwrap{padding:8px 18px 2px}
+  .timer{height:7px; border-radius:6px; background:#ffffff1a; overflow:hidden}
+  .timer > i{display:block; height:100%; width:100%; background:linear-gradient(90deg,var(--cyan),var(--blue)); transition:width .1s linear}
+  .timer.low > i{background:linear-gradient(90deg,var(--orange),#f0873f)}
+  /* stage */
+  .stage{flex:1; position:relative; display:flex; align-items:center; justify-content:center; min-height:0}
+  canvas{touch-action:none; display:block}
+  .hint{position:absolute; bottom:10px; left:0; right:0; text-align:center; font-size:12px; color:var(--muted); pointer-events:none}
+  .hint b{color:var(--cyan)} .hint .bad{color:var(--orange)}
+  /* overlays */
+  .overlay{position:fixed; inset:0; display:flex; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:22px; z-index:20;
+    background:radial-gradient(700px 500px at 50% 30%, #01213a66, #01162be6); backdrop-filter:blur(3px)}
+  .overlay[hidden]{display:none}
+  .panel{width:min(560px,94vw); margin:auto; background:linear-gradient(180deg,#053056f2,#022a4bf2); border:1px solid #0a4a7a; border-radius:18px;
+    padding:30px 30px 26px; box-shadow:0 30px 80px #00000066; position:relative; overflow:hidden}
+  .panel::before,.panel::after{display:none}
+  .eyebrow{font-family:var(--fmono); font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin:22px 0 0}
+  h1{font-family:var(--fdisplay); font-weight:700; font-size:clamp(34px,8vw,54px); line-height:.98; margin:8px 0 4px; letter-spacing:-.01em}
+  h1 .sub{display:block; font-size:clamp(15px,3.4vw,19px); font-weight:500; color:var(--cyan); letter-spacing:0; margin-top:10px}
+  h2{font-family:var(--fdisplay); font-weight:700; font-size:clamp(22px,5vw,30px); margin:6px 0 2px}
+  p.lede{font-size:14.5px; line-height:1.5; color:#cfe0ee; margin:14px 0 20px}
+  p.lede b{color:#fff}
+  .rowstat{display:flex; gap:12px; margin:16px 0 6px; flex-wrap:wrap}
+  .stat{flex:1 1 0; min-width:120px; background:#0a3a63; border:1px solid #12558c; border-radius:12px; padding:12px 14px}
+  .stat .k{font-family:var(--fmono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted)}
+  .stat .v{font-family:var(--fmono); font-weight:700; font-size:26px; margin-top:4px}
+  .stat .v.cyan{color:var(--cyan)} .stat .v.orange{color:var(--orange)} .stat .v.blue{color:#5db4e8}
+  .note{font-size:13px; line-height:1.5; color:#bcd4e8; background:#0a3a6366; border-left:3px solid var(--cyan); padding:11px 14px; border-radius:0 10px 10px 0; margin:14px 0}
+  .note.tel{border-left-color:var(--orange)}
+  .note .h{display:block; font-family:var(--fmono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--cyan); margin-bottom:4px}
+  .note.tel .h{color:var(--orange)}
+  .btn{appearance:none; border:0; cursor:pointer; font-family:var(--fdisplay); font-weight:600; font-size:17px;
+    color:#02243f; background:var(--cyan); padding:15px 22px; border-radius:12px; width:100%; margin-top:8px; transition:transform .08s ease, filter .15s}
+  .btn:hover{filter:brightness(1.06)} .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:transparent; color:var(--ink); border:1px solid #ffffff33}
+  .btn.row{width:auto; flex:1}
+  .btns{display:flex; gap:10px; margin-top:10px}
+  .foot{font-size:11.5px; color:var(--muted); text-align:center; margin-top:14px; line-height:1.5}
+  @media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+  @media (max-height:560px){ .panel{padding:20px} h1{font-size:38px} .eyebrow{margin-top:6px} }
+</style>
+</head>
+<body>
+<div class="wrap" aria-hidden="false">
+  <div class="bar">
+    <div class="node"><span class="lbl">Fab Rush</span></div>
+    <div class="readouts">
+      <div class="ro"><div class="k">Score</div><div class="v cyan" id="hudScore">0</div></div>
+      <div class="ro"><div class="k">Scrapped</div><div class="v orange" id="hudScrap">0</div></div>
+      <div class="ro"><div class="k">Time</div><div class="v" id="hudTime">0.0</div></div>
+    </div>
+  </div>
+  <div class="node">
+    <span class="lbl" id="nodeLbl">—</span>
+    <span class="yr" id="nodeYr"></span>
+    <span class="task" id="nodeTask"></span>
+  </div>
+  <div class="timerwrap"><div class="timer" id="timerBar"><i></i></div></div>
+  <div class="stage" id="stage">
+    <canvas id="cv"></canvas>
+    <div class="hint" id="hint">Tap the <b>silver dies</b> · avoid the <span class="bad">orange defects</span></div>
+  </div>
+</div>
+
+<!-- START -->
+<div class="overlay" id="ovStart">
+  <div class="panel">
+    <div class="eyebrow">JP Professional Interest</div>
+    <h1>Fab&nbsp;Rush<span class="sub">Build a city on a chip.</span></h1>
+    <p class="lede">A modern chip packs about <b>20 billion transistors</b> onto silicon the size of a <b>penny</b>. You're the fab — tap the good dies onto the wafer before the clock runs out. Each era they <b>shrink and multiply</b>. That's Moore's Law. See how long you keep up.</p>
+    <div class="note">
+      <span class="h">How to play</span>
+      Tap silver dies to fab a working chip. Skip the orange defects — hit one and it's scrapped. Three eras, faster and tinier each time.
+    </div>
+    <button class="btn" id="btnStart">Start →</button>
+  </div>
+</div>
+
+<!-- ROUND INTRO -->
+<div class="overlay" id="ovRound" hidden>
+  <div class="panel">
+    <div class="eyebrow" id="rIntroStep">Round 1 of 3</div>
+    <h2 id="rIntroTitle">1997 · 250 nm</h2>
+    <p class="lede" id="rIntroBlurb"></p>
+    <div class="note tel"><span class="h">Telecom</span><span id="rIntroTel"></span></div>
+    <button class="btn" id="btnGo">Go →</button>
+  </div>
+</div>
+
+<!-- END -->
+<div class="overlay" id="ovEnd" hidden>
+  <div class="panel">
+    <div class="eyebrow">Shift complete</div>
+    <h2>Here's your yield.</h2>
+    <div class="rowstat">
+      <div class="stat"><div class="k">Working chips</div><div class="v cyan" id="endChips">0</div></div>
+      <div class="stat"><div class="k">Score</div><div class="v" id="endScore">0</div></div>
+      <div class="stat"><div class="k">Yield</div><div class="v orange" id="endYield">0%</div></div>
+    </div>
+    <div class="note">
+      <span class="h">That struggle was the point</span>
+      Intel's 1971 chip held <b>2,300</b> transistors. Today's flagships exceed <b>100 billion</b> — a roughly <b>40-million-fold</b> rise, on an area smaller than a penny. What felt frantic with your finger, engineers do with atoms — which is why a leading-edge fab costs <b>$20B+</b> and only <b>three companies</b> on Earth still attempt the smallest nodes.
+    </div>
+    <div class="note tel">
+      <span class="h">Why it matters</span>
+      The <b>5G/6G radio chips</b> and <b>optical engines</b> in towers and AI data-center switches are built using these same semiconductor processes. As chips become smaller and more complex, manufacturing precision, supply concentration and production capacity become increasingly important.
+    </div>
+    <button class="btn" id="btnAgain">Play again</button>
+    <div class="foot">Only the current score is shown. No names or results are stored.</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- rounds ----------
+  var ROUNDS=[
+    { year:"1997", node:"250 nm", step:"Round 1 of 3",
+      blurb:"Chips were big and roomy. Only a handful fit a wafer. This should feel easy — enjoy it.",
+      tel:"This era's silicon ran 2G and early-3G base stations.",
+      slot:56, defect:0.03, time:20 },
+    { year:"2006", node:"90 nm", step:"Round 2 of 3",
+      blurb:"Smaller dies, many more of them, and the first defects appear. Aim carefully.",
+      tel:"These are the RF and baseband chips inside 3G/4G radios and the first smartphones.",
+      slot:30, defect:0.09, time:20 },
+    { year:"2025", node:"2 nm", step:"Round 3 of 3",
+      blurb:"Today's leading edge. Dozens of tiny dies, defects everywhere, no time. This is the wall engineers hit every two years.",
+      tel:"5G/6G RF front-ends, GaN power amps and silicon-photonic optical engines are fabbed on nodes like this.",
+      slot:15, defect:0.15, time:22 },
+  ];
+  var POINTS=[1,3,8]; // value per working chip rises as the node shrinks
+
+  // ---------- state ----------
+  var cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+  var stage=document.getElementById('stage');
+  var DPR=Math.min(window.devicePixelRatio||1,2);
+  var W=0,H=0, cx=0,cy=0, R=0, flatY=0;
+  var slots=[], slotSize=40;
+  var ri=0, running=false, tEnd=0, tLeft=0;
+  var totChips=0, totScrap=0, totScore=0, roundFits=[];
+  var pops=[];
+
+  function fit(){
+    var r=stage.getBoundingClientRect();
+    W=Math.max(240,r.width); H=Math.max(240,r.height);
+    cv.style.width=W+'px'; cv.style.height=H+'px';
+    cv.width=Math.floor(W*DPR); cv.height=Math.floor(H*DPR);
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    var m=Math.min(W,H);
+    R=m*0.46; cx=W/2; cy=H/2; flatY=cy+R*0.82; // flat near bottom
+    if(running) layout();
+  }
+  window.addEventListener('resize',fit);
+
+  function layout(){
+    slots=[];
+    var s=ROUNDS[ri].slot; // base px at ~min dimension 640
+    var scale=Math.min(W,H)/640; slotSize=Math.max(9,s*scale);
+    var d=slotSize*1.32;
+    var defRate=ROUNDS[ri].defect;
+    for(var y=cy-R+slotSize; y<=flatY-slotSize*0.4; y+=d){
+      for(var x=cx-R+slotSize; x<=cx+R-slotSize; x+=d){
+        var dx=x-cx, dy=y-cy;
+        if(dx*dx+dy*dy <= (R-slotSize*0.55)*(R-slotSize*0.55) && y<=flatY-slotSize*0.4){
+          slots.push({x:x,y:y,filled:false,defect:Math.random()<defRate});
+        }
+      }
+    }
+    roundFits[ri]=slots.length;
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // wafer disc
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx,cy,R,0,Math.PI*2);
+    ctx.closePath();
+    ctx.clip();
+    var g=ctx.createRadialGradient(cx-R*0.3,cy-R*0.35,R*0.1,cx,cy,R*1.1);
+    g.addColorStop(0,'#e7edf2'); g.addColorStop(.55,'#b9c4ce'); g.addColorStop(1,'#8a97a3');
+    ctx.fillStyle=g; ctx.fillRect(cx-R,cy-R,R*2,R*2);
+    // flat edge (cover below flatY)
+    ctx.fillStyle='#02243f'; ctx.fillRect(cx-R,flatY,R*2,R*2);
+    ctx.restore();
+    // rim
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.lineWidth=2; ctx.strokeStyle='#5b6b78'; ctx.stroke();
+    // notch flat line
+    ctx.beginPath(); ctx.moveTo(cx-Math.sqrt(Math.max(0,R*R-(flatY-cy)*(flatY-cy))),flatY);
+    ctx.lineTo(cx+Math.sqrt(Math.max(0,R*R-(flatY-cy)*(flatY-cy))),flatY);
+    ctx.lineWidth=2; ctx.strokeStyle='#5b6b78'; ctx.stroke();
+
+    var hs=slotSize*0.5, r2=Math.max(1.5,slotSize*0.14);
+    for(var i=0;i<slots.length;i++){
+      var sN=slots[i], x=sN.x, y=sN.y;
+      if(sN.filled){
+        ctx.fillStyle='#0067B1'; roundRect(x-hs*0.9,y-hs*0.9,hs*1.8,hs*1.8,r2); ctx.fill();
+        ctx.strokeStyle='#00C9D4'; ctx.lineWidth=Math.max(1,slotSize*0.06); roundRect(x-hs*0.9,y-hs*0.9,hs*1.8,hs*1.8,r2); ctx.stroke();
+        // die detail
+        ctx.strokeStyle='#00c9d488'; ctx.lineWidth=1; ctx.beginPath();
+        ctx.moveTo(x,y-hs*0.9); ctx.lineTo(x,y+hs*0.9); ctx.moveTo(x-hs*0.9,y); ctx.lineTo(x+hs*0.9,y); ctx.stroke();
+      } else if(sN.defect){
+        ctx.fillStyle='#E1523D'; ctx.beginPath(); ctx.arc(x,y,hs*0.62,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='#ffd2c8'; ctx.beginPath(); ctx.arc(x-hs*0.18,y-hs*0.18,hs*0.16,0,Math.PI*2); ctx.fill();
+      } else {
+        ctx.fillStyle='#7f8d99'; roundRect(x-hs*0.82,y-hs*0.82,hs*1.64,hs*1.64,r2); ctx.fill();
+        ctx.fillStyle='#eef2f5'; roundRect(x-hs*0.66,y-hs*0.66,hs*1.32,hs*1.32,r2*0.8); ctx.fill();
+      }
+    }
+    // pops
+    for(var k=pops.length-1;k>=0;k--){
+      var pp=pops[k]; pp.t+=1;
+      var a=1-pp.t/12;
+      if(a<=0){pops.splice(k,1);continue;}
+      ctx.globalAlpha=a;
+      ctx.strokeStyle=pp.bad?'#E1523D':'#00C9D4'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(pp.x,pp.y,(pp.bad?slotSize*0.5:slotSize*0.4)+pp.t*2,0,Math.PI*2); ctx.stroke();
+      ctx.globalAlpha=1;
+    }
+  }
+  function roundRect(x,y,w,h,r){ ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+  // ---------- interaction ----------
+  function onTap(e){
+    if(!running) return;
+    e.preventDefault();
+    var rect=cv.getBoundingClientRect();
+    var px=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
+    var py=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
+    var best=-1, bd=slotSize*slotSize*0.36;
+    for(var i=0;i<slots.length;i++){
+      if(slots[i].filled) continue;
+      var dx=slots[i].x-px, dy=slots[i].y-py, dd=dx*dx+dy*dy;
+      if(dd<bd){bd=dd;best=i;}
+    }
+    if(best<0) return; // missed all — no penalty, just tension
+    var sN=slots[best];
+    if(sN.defect){
+      totScrap++; pops.push({x:sN.x,y:sN.y,t:0,bad:true});
+      sN.filled=true; sN.scr=true; // consume so you can't tap again
+    } else {
+      sN.filled=true; totChips++; totScore+=POINTS[ri];
+      pops.push({x:sN.x,y:sN.y,t:0,bad:false});
+    }
+    updateHud();
+  }
+  cv.addEventListener('mousedown',onTap);
+  cv.addEventListener('touchstart',onTap,{passive:false});
+
+  function updateHud(){
+    document.getElementById('hudScore').textContent=totScore;
+    document.getElementById('hudScrap').textContent=totScrap;
+  }
+
+  // ---------- flow ----------
+  function showRoundIntro(){
+    var r=ROUNDS[ri];
+    document.getElementById('rIntroStep').textContent=r.step;
+    document.getElementById('rIntroTitle').textContent=r.year+' · '+r.node;
+    document.getElementById('rIntroBlurb').textContent=r.blurb;
+    document.getElementById('rIntroTel').textContent=r.tel;
+    show('ovRound');
+  }
+  function startRound(){
+    hideAll();
+    var r=ROUNDS[ri];
+    document.getElementById('nodeLbl').textContent=r.node;
+    document.getElementById('nodeYr').textContent=r.year;
+    document.getElementById('nodeTask').innerHTML='Fabbing: <b>'+telTask(ri)+'</b>';
+    fit(); layout();
+    running=true; tLeft=r.time; tEnd=performance.now()+r.time*1000;
+    loop();
+  }
+  function telTask(i){ return ['logic & early RF','3G/4G RF + baseband','5G/6G RF, GaN & optical'][i]; }
+
+  function loop(now){
+    now=now||performance.now();
+    if(running){
+      tLeft=Math.max(0,(tEnd-now)/1000);
+      var r=ROUNDS[ri];
+      document.getElementById('hudTime').textContent=tLeft.toFixed(1);
+      var bar=document.getElementById('timerBar');
+      bar.querySelector('i').style.width=(tLeft/r.time*100)+'%';
+      bar.classList.toggle('low',tLeft<5);
+      draw();
+      if(tLeft<=0){ running=false; endRound(); return; }
+      requestAnimationFrame(loop);
+    }
+  }
+  function endRound(){
+    if(ri<ROUNDS.length-1){ ri++; showRoundIntro(); }
+    else finish();
+  }
+  function finish(){
+    var yield_=totChips+totScrap>0?Math.round(totChips/(totChips+totScrap)*100):0;
+    animCount('endChips',totChips); animCount('endScore',totScore);
+    document.getElementById('endYield').textContent=yield_+'%';
+    show('ovEnd');
+  }
+  function animCount(id,to){
+    var el=document.getElementById(id); if(reduce){el.textContent=to;return;}
+    var t0=performance.now();
+    function st(n){var p=Math.min(1,(n-t0)/600); el.textContent=Math.round(to*p); if(p<1)requestAnimationFrame(st);}
+    requestAnimationFrame(st);
+  }
+
+  // ---------- overlays ----------
+  function show(id){ hideAll(); document.getElementById(id).hidden=false; }
+  function hideAll(){ ['ovStart','ovRound','ovEnd'].forEach(function(i){document.getElementById(i).hidden=true;}); }
+
+  function newGame(){
+    ri=0; totChips=0; totScrap=0; totScore=0; roundFits=[]; pops=[];
+    updateHud(); document.getElementById('hudTime').textContent='0.0';
+    showRoundIntro();
+  }
+
+  document.getElementById('btnStart').addEventListener('click',newGame);
+  document.getElementById('btnGo').addEventListener('click',startRound);
+  document.getElementById('btnAgain').addEventListener('click',newGame);
+  document.addEventListener('keydown',function(e){
+    if(e.code==='Space'){
+      if(!document.getElementById('ovStart').hidden){e.preventDefault();newGame();}
+      else if(!document.getElementById('ovRound').hidden){e.preventDefault();startRound();}
+    }
+  });
+
+  fit();
+})();
+</script>
+</body>
+</html>
