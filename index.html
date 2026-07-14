@@ -42,6 +42,7 @@
   .ro .v.cyan{color:var(--cyan)} .ro .v.orange{color:var(--orange)}
   /* node strip */
   .node{padding:0 18px; display:flex; align-items:center; gap:12px}
+  .node .subtitle{font-family:var(--fmono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted)}
   .node .lbl{font-family:var(--fdisplay); font-weight:700; font-size:15px; letter-spacing:.02em}
   .node .yr{font-family:var(--fmono); color:var(--cyan); font-size:13px}
   .node .task{font-size:12.5px; color:var(--muted)}
@@ -92,7 +93,7 @@
 <body>
 <div class="wrap" aria-hidden="false">
   <div class="bar">
-    <div class="node"><span class="lbl">Moore's Law Challenge</span></div>
+    <div class="node"><span class="subtitle">JP Professional Interest</span><span class="lbl">Moore's Law Challenge</span></div>
     <div class="readouts">
       <div class="ro"><div class="k">Score</div><div class="v cyan" id="hudScore">0</div></div>
       <div class="ro"><div class="k">Scrapped</div><div class="v orange" id="hudScrap">0</div></div>
@@ -115,7 +116,7 @@
 <div class="overlay" id="ovStart">
   <div class="panel">
     <div class="eyebrow">JP Professional Interest</div>
-    <h1>Fab&nbsp;Rush<span class="sub">Build a city on a chip.</span></h1>
+    <h1>Moore's Law Challenge<span class="sub">Build a city on a chip.</span></h1>
     <p class="lede">A modern chip packs about <b>20 billion transistors</b> onto silicon the size of a <b>penny</b>. You're the fab - tap the good dies onto the wafer before the clock runs out. Each era they <b>shrink and multiply</b>. That's Moore's Law. See how long you keep up.</p>
     <div class="note">
       <span class="h">How to play</span>
