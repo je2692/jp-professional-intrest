@@ -166,7 +166,7 @@
   // ---------- rounds ----------
   var ROUNDS=[
     { year:"1997", node:"250 nm", step:"Round 1 of 3",
-      blurb:"Chips were big and roomy. Only a handful fit a wafer. This should feel easy — enjoy it.",
+      blurb:"Chips were big and roomy. Only a handful fit a wafer",
       tel:"This era's silicon ran 2G and early-3G base stations.",
       slot:56, defect:0.03, time:20 },
     { year:"2006", node:"90 nm", step:"Round 2 of 3",
@@ -244,17 +244,49 @@
     for(var i=0;i<slots.length;i++){
       var sN=slots[i], x=sN.x, y=sN.y;
       if(sN.filled){
-        ctx.fillStyle='#0067B1'; roundRect(x-hs*0.9,y-hs*0.9,hs*1.8,hs*1.8,r2); ctx.fill();
+        // cast shadow off the wafer surface
+        ctx.save();
+        ctx.shadowColor='rgba(0,20,40,0.55)'; ctx.shadowBlur=hs*0.5; ctx.shadowOffsetX=hs*0.12; ctx.shadowOffsetY=hs*0.22;
+        var gf=ctx.createLinearGradient(x-hs*0.9,y-hs*0.9,x+hs*0.9,y+hs*0.9);
+        gf.addColorStop(0,'#1c8fe0'); gf.addColorStop(.5,'#0067B1'); gf.addColorStop(1,'#004a80');
+        ctx.fillStyle=gf; roundRect(x-hs*0.9,y-hs*0.9,hs*1.8,hs*1.8,r2); ctx.fill();
+        ctx.restore();
         ctx.strokeStyle='#00C9D4'; ctx.lineWidth=Math.max(1,slotSize*0.06); roundRect(x-hs*0.9,y-hs*0.9,hs*1.8,hs*1.8,r2); ctx.stroke();
-        // die detail
+        // silicon die detail: scribe lines + bond-pad corners
         ctx.strokeStyle='#00c9d488'; ctx.lineWidth=1; ctx.beginPath();
         ctx.moveTo(x,y-hs*0.9); ctx.lineTo(x,y+hs*0.9); ctx.moveTo(x-hs*0.9,y); ctx.lineTo(x+hs*0.9,y); ctx.stroke();
+        ctx.fillStyle='#bff5fa';
+        var pc=hs*0.72;
+        [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(c){ ctx.beginPath(); ctx.arc(x+c[0]*pc,y+c[1]*pc,Math.max(0.6,hs*0.08),0,Math.PI*2); ctx.fill(); });
       } else if(sN.defect){
+        ctx.save();
+        ctx.shadowColor='rgba(0,20,40,0.4)'; ctx.shadowBlur=hs*0.4; ctx.shadowOffsetX=hs*0.1; ctx.shadowOffsetY=hs*0.18;
         ctx.fillStyle='#E1523D'; ctx.beginPath(); ctx.arc(x,y,hs*0.62,0,Math.PI*2); ctx.fill();
+        ctx.restore();
         ctx.fillStyle='#ffd2c8'; ctx.beginPath(); ctx.arc(x-hs*0.18,y-hs*0.18,hs*0.16,0,Math.PI*2); ctx.fill();
       } else {
-        ctx.fillStyle='#7f8d99'; roundRect(x-hs*0.82,y-hs*0.82,hs*1.64,hs*1.64,r2); ctx.fill();
+        // unfabbed silicon die: raised block with cast shadow, bevel and circuit texture
+        ctx.save();
+        ctx.shadowColor='rgba(0,20,40,0.5)'; ctx.shadowBlur=hs*0.45; ctx.shadowOffsetX=hs*0.1; ctx.shadowOffsetY=hs*0.2;
+        var gd=ctx.createLinearGradient(x-hs*0.82,y-hs*0.82,x+hs*0.82,y+hs*0.82);
+        gd.addColorStop(0,'#a3b0bb'); gd.addColorStop(.5,'#7f8d99'); gd.addColorStop(1,'#616e79');
+        ctx.fillStyle=gd; roundRect(x-hs*0.82,y-hs*0.82,hs*1.64,hs*1.64,r2); ctx.fill();
+        ctx.restore();
+        // top bevel highlight
+        ctx.strokeStyle='#c9d3db77'; ctx.lineWidth=1;
+        roundRect(x-hs*0.82,y-hs*0.82,hs*1.64,hs*1.64,r2); ctx.stroke();
+        // inset die face
         ctx.fillStyle='#eef2f5'; roundRect(x-hs*0.66,y-hs*0.66,hs*1.32,hs*1.32,r2*0.8); ctx.fill();
+        // faint circuit trace texture so it reads as silicon, not a button
+        ctx.strokeStyle='#c3cdd6'; ctx.lineWidth=Math.max(0.5,slotSize*0.03);
+        ctx.beginPath();
+        ctx.moveTo(x-hs*0.66,y-hs*0.22); ctx.lineTo(x-hs*0.1,y-hs*0.22); ctx.lineTo(x-hs*0.1,y+hs*0.66);
+        ctx.moveTo(x+hs*0.1,y-hs*0.66); ctx.lineTo(x+hs*0.1,y+hs*0.15); ctx.lineTo(x+hs*0.66,y+hs*0.15);
+        ctx.stroke();
+        // corner bond pads
+        ctx.fillStyle='#b7c1ca';
+        var pc2=hs*0.7;
+        [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(c){ ctx.fillRect(x+c[0]*pc2-hs*0.06,y+c[1]*pc2-hs*0.06,hs*0.12,hs*0.12); });
       }
     }
     // pops
