@@ -3,413 +3,457 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>JP Professional Interest</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#022c4f" />
+<title>Fab Rush — Moore's Law Challenge</title>
 <style>
   :root{
-    --navy:#022c4f; --navy2:#003763; --blue:#0067B1; --cyan:#00C9D4;
-    --orange:#E1523D; --silver:#C7D0D8; --ink:#EAF2F8; --muted:#89A4BB;
-    --fdisplay:'Space Grotesk',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-    --fmono:'Space Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
-    --fbody:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    --navy:#022c4f; --navy2:#003763; --blue:#0067b1; --cyan:#00c9d4;
+    --orange:#e1523d; --silver:#c7d0d8; --ink:#eaf2f8; --muted:#91a9bd;
+    --panel:#053056f2; --line:#12558c; --good:#2d9fe8;
+    --display:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;margin:0}
   body{
-    font-family:var(--fbody); color:var(--ink); overflow:hidden;
+    font-family:var(--display); color:var(--ink); overflow:hidden;
     background:
-      radial-gradient(1200px 800px at 50% -10%, #0a4a7a33, transparent 60%),
-      radial-gradient(900px 700px at 110% 120%, #00c9d41f, transparent 55%),
-      linear-gradient(160deg, #01243f 0%, var(--navy) 45%, var(--navy2) 100%);
-    background-attachment:fixed;
+      radial-gradient(1000px 720px at 45% -5%,#0a4a7a3d,transparent 62%),
+      radial-gradient(900px 700px at 110% 120%,#00c9d41b,transparent 58%),
+      linear-gradient(160deg,#011d34 0%,var(--navy) 48%,var(--navy2) 100%);
   }
-  body::before{ /* faint circuit grid */
-    content:""; position:fixed; inset:0; pointer-events:none; opacity:.35;
-    background-image:
-      linear-gradient(#0a4a7a22 1px, transparent 1px),
-      linear-gradient(90deg, #0a4a7a22 1px, transparent 1px);
-    background-size:44px 44px; mask-image:radial-gradient(circle at 50% 40%, #000 40%, transparent 85%);
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; opacity:.32;
+    background-image:linear-gradient(#0a4a7a22 1px,transparent 1px),linear-gradient(90deg,#0a4a7a22 1px,transparent 1px);
+    background-size:44px 44px; mask-image:radial-gradient(circle at 50% 42%,#000 35%,transparent 88%);
   }
+  button{font:inherit}
   .wrap{position:fixed; inset:0; display:flex; flex-direction:column}
-  /* top bar */
-  .bar{display:flex; align-items:center; justify-content:space-between; padding:14px 18px; gap:12px}
-  .readouts{display:flex; gap:16px; align-items:center}
-  .ro{ text-align:right; line-height:1 }
-  .ro .k{font-family:var(--fmono); font-size:10px; letter-spacing:.12em; color:var(--muted); text-transform:uppercase}
-  .ro .v{font-family:var(--fmono); font-weight:700; font-size:20px; color:var(--ink); margin-top:4px}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;gap:12px;z-index:2}
+  .brand{min-width:0}
+  .brand .k{font:700 10px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .brand .v{font-weight:750;font-size:16px;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .readouts{display:flex;gap:14px;align-items:center;flex:0 0 auto}
+  .ro{text-align:right;line-height:1}
+  .ro .k{font:700 9px/1 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+  .ro .v{font:700 19px/1.1 var(--mono);margin-top:4px;color:var(--ink)}
   .ro .v.cyan{color:var(--cyan)} .ro .v.orange{color:var(--orange)}
-  /* node strip */
-  .node{padding:0 18px; display:flex; align-items:center; gap:12px}
-  .node .subtitle{font-family:var(--fmono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted)}
-  .node .lbl{font-family:var(--fdisplay); font-weight:700; font-size:15px; letter-spacing:.02em}
-  .node .yr{font-family:var(--fmono); color:var(--cyan); font-size:13px}
-  .node .task{font-size:12.5px; color:var(--muted)}
-  .node .task b{color:#cfe2f0; font-weight:600}
-  /* timer */
-  .timerwrap{padding:8px 18px 2px}
-  .timer{height:7px; border-radius:6px; background:#ffffff1a; overflow:hidden}
-  .timer > i{display:block; height:100%; width:100%; background:linear-gradient(90deg,var(--cyan),var(--blue)); transition:width .1s linear}
-  .timer.low > i{background:linear-gradient(90deg,var(--orange),#f0873f)}
-  /* stage */
-  .stage{flex:1; position:relative; display:flex; align-items:center; justify-content:center; min-height:0}
-  canvas{touch-action:none; display:block}
-  .hint{position:absolute; bottom:10px; left:0; right:0; text-align:center; font-size:12px; color:var(--muted); pointer-events:none}
-  .hint b{color:var(--cyan)} .hint .bad{color:var(--orange)}
-  /* overlays */
-  .overlay{position:fixed; inset:0; display:flex; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:22px; z-index:20;
-    background:radial-gradient(700px 500px at 50% 30%, #01213a66, #01162be6); backdrop-filter:blur(3px)}
+  .node{padding:0 16px;display:flex;align-items:baseline;gap:10px;min-height:25px;z-index:2}
+  .node .lbl{font-weight:750;font-size:15px}.node .yr{font:700 12px var(--mono);color:var(--cyan)}
+  .node .task{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .node .task b{color:#d8e7f2}
+  .timerwrap{padding:6px 16px 2px;z-index:2}
+  .timer{height:7px;border-radius:7px;background:#ffffff1a;overflow:hidden}
+  .timer>i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));transition:width .08s linear}
+  .timer.low>i{background:linear-gradient(90deg,var(--orange),#f0873f)}
+  .stage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;min-height:0}
+  canvas{display:block;touch-action:none}
+  .controls{position:absolute;left:12px;right:12px;bottom:12px;display:flex;align-items:center;justify-content:center;gap:10px;pointer-events:none}
+  .scan{pointer-events:auto;appearance:none;border:1px solid #22b7c5;background:#073a61e8;color:var(--ink);border-radius:12px;padding:10px 14px;box-shadow:0 8px 24px #00132299;cursor:pointer;font-weight:700;font-size:13px;min-width:245px}
+  .scan b{color:var(--cyan)}.scan:disabled{opacity:.45;cursor:default}.scan:active:not(:disabled){transform:translateY(1px)}
+  .hint{position:absolute;left:8px;right:8px;bottom:60px;text-align:center;font-size:11.5px;color:var(--muted);pointer-events:none;text-shadow:0 1px 4px #00182c}
+  .hint b{color:#eef6fb}.hint .cyan{color:var(--cyan)}
+  .toast{position:absolute;left:50%;top:12px;transform:translate(-50%,-12px);opacity:0;pointer-events:none;padding:8px 12px;border-radius:10px;background:#001a30e8;border:1px solid #ffffff24;font:700 12px var(--mono);transition:opacity .16s,transform .16s;white-space:nowrap;z-index:4}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .toast.bad{border-color:#e1523d99;color:#ffd2c8}.toast.good{border-color:#00c9d499;color:#c6fbff}
+
+  .overlay{position:fixed;inset:0;display:flex;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px;z-index:20;background:radial-gradient(760px 520px at 50% 28%,#01213a66,#01162bee);backdrop-filter:blur(4px)}
   .overlay[hidden]{display:none}
-  .panel{width:min(560px,94vw); margin:auto; background:linear-gradient(180deg,#053056f2,#022a4bf2); border:1px solid #0a4a7a; border-radius:18px;
-    padding:30px 30px 26px; box-shadow:0 30px 80px #00000066; position:relative; overflow:hidden}
-  .panel::before,.panel::after{display:none}
-  .eyebrow{font-family:var(--fmono); font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin:22px 0 0}
-  h1{font-family:var(--fdisplay); font-weight:700; font-size:clamp(34px,8vw,54px); line-height:.98; margin:8px 0 4px; letter-spacing:-.01em}
-  h1 .sub{display:block; font-size:clamp(15px,3.4vw,19px); font-weight:500; color:var(--cyan); letter-spacing:0; margin-top:10px}
-  h2{font-family:var(--fdisplay); font-weight:700; font-size:clamp(22px,5vw,30px); margin:6px 0 2px}
-  p.lede{font-size:14.5px; line-height:1.5; color:#cfe0ee; margin:14px 0 20px}
-  p.lede b{color:#fff}
-  .rowstat{display:flex; gap:12px; margin:16px 0 6px; flex-wrap:wrap}
-  .stat{flex:1 1 0; min-width:120px; background:#0a3a63; border:1px solid #12558c; border-radius:12px; padding:12px 14px}
-  .stat .k{font-family:var(--fmono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted)}
-  .stat .v{font-family:var(--fmono); font-weight:700; font-size:26px; margin-top:4px}
-  .stat .v.cyan{color:var(--cyan)} .stat .v.orange{color:var(--orange)} .stat .v.blue{color:#5db4e8}
-  .note{font-size:13px; line-height:1.5; color:#bcd4e8; background:#0a3a6366; border-left:3px solid var(--cyan); padding:11px 14px; border-radius:0 10px 10px 0; margin:14px 0}
-  .note.tel{border-left-color:var(--orange)}
-  .note .h{display:block; font-family:var(--fmono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--cyan); margin-bottom:4px}
-  .note.tel .h{color:var(--orange)}
-  .btn{appearance:none; border:0; cursor:pointer; font-family:var(--fdisplay); font-weight:600; font-size:17px;
-    color:#02243f; background:var(--cyan); padding:15px 22px; border-radius:12px; width:100%; margin-top:8px; transition:transform .08s ease, filter .15s}
-  .btn:hover{filter:brightness(1.06)} .btn:active{transform:translateY(1px)}
-  .btn.ghost{background:transparent; color:var(--ink); border:1px solid #ffffff33}
-  .btn.row{width:auto; flex:1}
-  .btns{display:flex; gap:10px; margin-top:10px}
-  .foot{font-size:11.5px; color:var(--muted); text-align:center; margin-top:14px; line-height:1.5}
-  @media (prefers-reduced-motion: reduce){ *{transition:none!important} }
-  @media (max-height:560px){ .panel{padding:20px} h1{font-size:38px} .eyebrow{margin-top:6px} }
+  .panel{width:min(620px,95vw);margin:auto;background:linear-gradient(180deg,#06345bf5,#022846f5);border:1px solid #0b4b7e;border-radius:18px;padding:27px 28px 24px;box-shadow:0 30px 90px #0008;position:relative;overflow:hidden}
+  .panel::after{content:"";position:absolute;inset:auto -90px -110px auto;width:250px;height:250px;border-radius:50%;background:#00c9d40d;pointer-events:none}
+  .eyebrow{font:700 10.5px/1.2 var(--mono);letter-spacing:.17em;text-transform:uppercase;color:var(--muted);margin:0}
+  h1{font-size:clamp(34px,8vw,54px);line-height:.98;margin:9px 0 4px;letter-spacing:-.025em}
+  h1 .sub{display:block;font-size:clamp(15px,3.5vw,20px);font-weight:600;color:var(--cyan);letter-spacing:0;margin-top:10px;line-height:1.2}
+  h2{font-size:clamp(23px,5vw,31px);line-height:1.08;margin:8px 0 2px;letter-spacing:-.015em}
+  h3{font-size:15px;margin:0 0 5px;color:#fff}
+  .lede{font-size:14.5px;line-height:1.52;color:#d3e2ee;margin:14px 0 18px}.lede b{color:#fff}
+  .note{font-size:13px;line-height:1.47;color:#c6d9e9;background:#0a3a6370;border-left:3px solid var(--cyan);padding:11px 13px;border-radius:0 10px 10px 0;margin:12px 0}
+  .note.orange{border-left-color:var(--orange)}
+  .note .h{display:block;font:700 10px/1.2 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--cyan);margin-bottom:4px}.note.orange .h{color:#ff8a76}
+  .formula{font:700 13px/1.45 var(--mono);color:#fff;background:#001c33a8;border:1px solid #12558c;border-radius:11px;padding:12px 13px;margin:12px 0;text-align:center}
+  .formula .plus{color:var(--cyan)}.formula .minus{color:#ff8a76}
+  .scoregrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:15px 0 8px}
+  .stat{background:#0a3a63;border:1px solid #12558c;border-radius:12px;padding:11px 12px;min-width:0}
+  .stat .k{font:700 9.5px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .stat .v{font:700 clamp(21px,5vw,28px)/1.15 var(--mono);margin-top:5px;white-space:nowrap}.stat .v.cyan{color:var(--cyan)}.stat .v.orange{color:#ff7d68}
+  .breakdown{display:grid;grid-template-columns:1fr auto;gap:7px 14px;padding:11px 13px;margin:10px 0;border-radius:11px;background:#001d35a1;border:1px solid #ffffff12;font-size:12.5px;color:#c9dbea}
+  .breakdown b{font-family:var(--mono);color:#fff}.breakdown .neg{color:#ff8a76}.breakdown .pos{color:var(--cyan)}
+  .profile{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:7px 10px;background:#00c9d418;border:1px solid #00c9d45c;color:#d8fdff;font:700 11px var(--mono);margin:3px 0 5px}
+  .profile::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--cyan)}
+  .btn{appearance:none;border:0;cursor:pointer;font-weight:750;font-size:16px;color:#02243f;background:var(--cyan);padding:14px 18px;border-radius:12px;width:100%;margin-top:8px;transition:transform .08s,filter .15s,opacity .15s}
+  .btn:hover{filter:brightness(1.06)}.btn:active:not(:disabled){transform:translateY(1px)}.btn:disabled{opacity:.48;cursor:default}
+  .btn.ghost{background:transparent;color:var(--ink);border:1px solid #ffffff32}
+  .btns{display:flex;gap:9px;margin-top:8px}.btns .btn{flex:1;width:auto}
+  .foot{font-size:11px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.45}
+  .tiny{font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:8px}
+  @media (max-width:560px){
+    .bar{padding:10px 11px 6px}.brand .k{display:none}.brand .v{font-size:13px;max-width:118px}.readouts{gap:9px}.ro .v{font-size:16px}.ro .k{font-size:8px}
+    .node{padding:0 11px}.timerwrap{padding-left:11px;padding-right:11px}.panel{padding:23px 20px 20px}.scoregrid{gap:6px}.stat{padding:9px 8px}.scan{min-width:0;width:min(300px,88vw);font-size:12px}
+  }
+  @media (max-height:620px){.panel{padding-top:19px;padding-bottom:17px}.lede{margin:10px 0 12px}.note{margin:9px 0}.scoregrid{margin-top:10px}.foot{margin-top:8px}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap" aria-hidden="false">
   <div class="bar">
-    <div class="node"><span class="subtitle">JP Professional Interest</span><span class="lbl">Moore's Law Challenge</span></div>
+    <div class="brand"><div class="k">JP Professional Interest</div><div class="v">Moore's Law Challenge</div></div>
     <div class="readouts">
-      <div class="ro"><div class="k">Score</div><div class="v cyan" id="hudScore">0</div></div>
-      <div class="ro"><div class="k">Scrapped</div><div class="v orange" id="hudScrap">0</div></div>
+      <div class="ro"><div class="k">Points</div><div class="v cyan" id="hudScore">0</div></div>
+      <div class="ro"><div class="k">Working</div><div class="v" id="hudGood">0</div></div>
+      <div class="ro"><div class="k">Scrap</div><div class="v orange" id="hudScrap">0</div></div>
       <div class="ro"><div class="k">Time</div><div class="v" id="hudTime">0.0</div></div>
     </div>
   </div>
   <div class="node">
-    <span class="lbl" id="nodeLbl">—</span>
-    <span class="yr" id="nodeYr"></span>
+    <span class="lbl" id="nodeLbl">—</span><span class="yr" id="nodeYr"></span>
     <span class="task" id="nodeTask"></span>
   </div>
   <div class="timerwrap"><div class="timer" id="timerBar"><i></i></div></div>
   <div class="stage" id="stage">
-    <canvas id="cv"></canvas>
-    <div class="hint" id="hint">Tap the <b>silver dies</b> · avoid the <span class="bad">orange defects</span></div>
+    <canvas id="cv" aria-label="Interactive semiconductor wafer game"></canvas>
+    <div class="toast" id="toast" aria-live="polite"></div>
+    <div class="hint" id="hint">Tap dies you believe will pass · <span class="cyan">inspection</span> briefly reveals latent defects</div>
+    <div class="controls"><button class="scan" id="scanBtn" disabled><b>Inspection pulse</b> · waiting</button></div>
   </div>
 </div>
 
-<!-- START -->
 <div class="overlay" id="ovStart">
   <div class="panel">
-    <div class="eyebrow">JP Professional Interest</div>
-    <h1>Moore's Law Challenge<span class="sub">Build a city on a chip.</span></h1>
-    <p class="lede">A modern chip packs about <b>20 billion transistors</b> onto silicon the size of a <b>penny</b>. You're the fab - tap the good dies onto the wafer before the clock runs out. Each era they <b>shrink and multiply</b>. That's Moore's Law. See how long you keep up.</p>
+    <div class="eyebrow">Professional Interest · Interactive</div>
+    <h1>Moore's Law Challenge<span class="sub">Maximize shipped value - not just yield</span></h1>
+    <p class="lede">Run the same-function chip across three technology eras. Tap the dies you think will pass test. Some defects are <b>latent</b>, so you can spend precious time on a limited inspection pulse—or accept more scrap and move faster.</p>
+    <div class="formula"><span class="plus">POINTS = SHIPPED VALUE</span> <span class="minus">− SCRAP / REWORK</span></div>
     <div class="note">
-      <span class="h">How to play</span>
-      Tap silver dies to fab a working chip. Skip the orange defects - hit one and it's scrapped. Three eras, faster and tinier each time.
+      <span class="h">Why the scoring changed</span>
+      A perfect yield from processing only one die is not a successful fab. Untouched good dies are lost capacity; bad taps create scrap. The winning score balances <b>throughput, quality and inspection time</b>.
     </div>
-    <button class="btn" id="btnStart">Start →</button>
+    <div class="note orange">
+      <span class="h">Round pauses</span>
+      After every era, your screen shows points, yield, capacity capture and a quick discussion prompt. Continue only when the facilitator says go.
+    </div>
+    <button class="btn" id="btnStart">Start the shift →</button>
+    <div class="foot">Illustrative simulation. Process-node names are technology generations, not literal die dimensions; real fabs use automated process control, metrology and test.</div>
   </div>
 </div>
 
-<!-- ROUND INTRO -->
 <div class="overlay" id="ovRound" hidden>
   <div class="panel">
     <div class="eyebrow" id="rIntroStep">Round 1 of 3</div>
     <h2 id="rIntroTitle">1997 · 250 nm</h2>
     <p class="lede" id="rIntroBlurb"></p>
-    <div class="note tel"><span class="h">Telecom</span><span id="rIntroTel"></span></div>
-    <button class="btn" id="btnGo">Go →</button>
+    <div class="note"><span class="h">Your objective</span><span id="rIntroObjective"></span></div>
+    <div class="note orange"><span class="h">Telecom connection</span><span id="rIntroTel"></span></div>
+    <button class="btn" id="btnGo">Begin round →</button>
   </div>
 </div>
 
-<!-- END -->
+<div class="overlay" id="ovDebrief" hidden>
+  <div class="panel">
+    <div class="eyebrow" id="dStep">Round complete</div>
+    <h2 id="dTitle">Your round score</h2>
+    <div class="scoregrid">
+      <div class="stat"><div class="k">Round points</div><div class="v cyan" id="dPoints">0</div></div>
+      <div class="stat"><div class="k">Yield</div><div class="v" id="dYield">0%</div></div>
+      <div class="stat"><div class="k">Capacity captured</div><div class="v orange" id="dCapture">0%</div></div>
+    </div>
+    <div class="profile" id="dProfile">Balanced fab</div>
+    <div class="breakdown">
+      <span>Working dies shipped</span><b id="dGood">0</b>
+      <span>Shipped value</span><b class="pos" id="dShip">+0</b>
+      <span>Scrap / rework</span><b class="neg" id="dPenalty">−0</b>
+      <span>Good dies left unused</span><b id="dMissed">0</b>
+    </div>
+    <div class="note orange"><span class="h">Ask the room</span><span id="dPrompt"></span></div>
+    <div class="note"><span class="h">Quick era lesson</span><span id="dLesson"></span></div>
+    <div class="note orange"><span class="h">Consulting lens</span><span id="dConsulting"></span></div>
+    <button class="btn" id="btnNext" disabled>Discuss first · 6</button>
+    <div class="foot">The button unlocks after a short pause. Keep discussing until the facilitator says go.</div>
+  </div>
+</div>
+
 <div class="overlay" id="ovEnd" hidden>
   <div class="panel">
     <div class="eyebrow">Shift complete</div>
-    <h2>Here's your yield.</h2>
-    <div class="rowstat">
-      <div class="stat"><div class="k">Working chips</div><div class="v cyan" id="endChips">0</div></div>
-      <div class="stat"><div class="k">Score</div><div class="v" id="endScore">0</div></div>
-      <div class="stat"><div class="k">Yield</div><div class="v orange" id="endYield">0%</div></div>
+    <h2 id="endHeadline">Your fabrication profile</h2>
+    <div class="scoregrid">
+      <div class="stat"><div class="k">Total points</div><div class="v cyan" id="endScore">0</div></div>
+      <div class="stat"><div class="k">Average yield</div><div class="v" id="endYield">0%</div></div>
+      <div class="stat"><div class="k">Capacity captured</div><div class="v orange" id="endCapture">0%</div></div>
     </div>
+    <div class="profile" id="endProfile">Adaptive fab manager</div>
     <div class="note">
-      <span class="h">Did it get harder? That struggle was the point</span>
-      Intel's 1971 chip held <b>2,300</b> transistors. Today's flagships exceed <b>100 billion</b> - a roughly <b>40-million-fold</b> rise, on an area smaller than a penny. What felt frantic with your finger, engineers do with atoms - which is why a leading-edge fab costs <b>$20B+</b> and only <b>three companies</b> on Earth still attempt the smallest nodes.
+      <span class="h">What the game was really measuring</span>
+      <b>Yield is necessary but not sufficient.</b> A fab also has to ship enough working product, use scarce capacity well and manage inspection, rework and time-to-market.
     </div>
-    <div class="note tel">
-      <span class="h">Why it matters</span>
-      The <b>5G/6G radio chips</b> and <b>optical engines</b> in towers and AI data-center switches are built using these same semiconductor processes. As chips become smaller and more complex, manufacturing precision, supply concentration and production capacity become increasingly important.
+    <div class="note orange">
+      <span class="h">Telecom engagement takeaway</span>
+      The economically “best” strategy changes with allocation rights, warranty exposure, service-level commitments, launch timing and single-source dependencies—the same variables that surface in diligence, breach claims and damages analyses.
     </div>
-    <button class="btn" id="btnAgain">Play again</button>
+    <div class="btns">
+      <button class="btn ghost" id="btnCopy">Copy result</button>
+      <button class="btn" id="btnAgain">Play again</button>
+    </div>
+    <div class="foot" id="endFoot"></div>
   </div>
 </div>
 
 <script>
 (function(){
   "use strict";
-  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var LOG=640, CX=320, CY=302, RAD=270, FLAT=526, MAX_SCORE=1000;
+  var qs=new URLSearchParams(location.search);
+  var SESSION_SEED=qs.get('seed')||'FTI-SEMIS-2026';
 
-  // ---------- rounds ----------
   var ROUNDS=[
-    { year:"1997", node:"250 nm", step:"Round 1 of 3",
-      blurb:"Chips were big and roomy. Only a handful fit a wafer",
-      tel:"This era's silicon ran 2G and early-3G base stations.",
-      slot:56, defect:0.03, time:20 },
-    { year:"2006", node:"90 nm", step:"Round 2 of 3",
-      blurb:"Smaller dies, many more of them, and the first defects appear. Aim carefully.",
-      tel:"These are the RF and baseband chips inside 3G/4G radios and the first smartphones.",
-      slot:30, defect:0.09, time:20 },
-    { year:"2025", node:"2 nm", step:"Round 3 of 3",
-      blurb:"Today's leading edge. Dozens of tiny dies, defects everywhere, no time. This is the wall engineers hit every two years.",
-      tel:"5G/6G RF front-ends, GaN power amps and silicon-photonic optical engines are fabbed on nodes like this.",
-      slot:15, defect:0.15, time:22 },
+    {
+      year:'1997', node:'250 nm', step:'Round 1 of 3 · Relative process simplicity',
+      blurb:'Large visual targets and a relatively forgiving process window. The defects are visible if you slow down—but every second still costs output.',
+      objective:'Balance speed and accuracy. You have one inspection pulse, but the visual cues are intentionally easier in this era.',
+      tel:'This era powered 2G networks and early digital base-station logic. The lesson is not that old chips were simple—it is that later integration raised the number of trade-offs.',
+      prompt:'What did you optimize first: speed, accuracy, or inspection? What information did you wish you had?',
+      lesson:'At larger design rules, manufacturing tolerances are relatively wider. The economic focus is often stable output, cost and continuity—not simply the smallest possible node.',
+      consulting:'A telecom product may be better served by a mature, resilient process than by leading-edge silicon. In diligence, ask whether the roadmap truly requires the newest node.',
+      slot:64, defectRate:.06, time:16, scans:1, scanCost:1.2, cue:.88,
+      task:'2G / early digital radio silicon'
+    },
+    {
+      year:'2006', node:'90 nm', step:'Round 2 of 3 · Integration and power trade-offs',
+      blurb:'More dies, tighter spacing and subtler defects. Throughput rises, but leakage, heat and process variation begin to matter much more.',
+      objective:'Use up to two inspection pulses. High yield with low capacity capture will score poorly; blind speed creates expensive scrap.',
+      tel:'90 nm-class processes sat behind 3G, early smartphones and increasingly integrated baseband and network processors.',
+      prompt:'What changed when the wafer became crowded? Did you change strategy—or just tap faster?',
+      lesson:'By the mid-2000s, scaling was no longer only about fitting more transistors. Power, leakage, interconnect and process control became central design constraints.',
+      consulting:'More integration can reduce unit cost while increasing IP, supplier and qualification dependencies. That shifts both deal diligence and dispute exposure.',
+      slot:38, defectRate:.10, time:17, scans:2, scanCost:1.2, cue:.48,
+      task:'3G / early-4G baseband and network chips'
+    },
+    {
+      year:'2025', node:'2 nm', step:'Round 3 of 3 · Leading-edge yield ramp',
+      blurb:'The node name is a generation label, not a literal die size. Here it represents a same-function design with far more density, much tighter tolerances and a difficult early yield ramp.',
+      objective:'You cannot process everything. Decide when inspection is worth the time and how much scrap you will accept to capture scarce capacity.',
+      tel:'Leading-edge logic supports 5G-Advanced, AI-RAN and high-end switching, while RF, power and optical functions often mix several process technologies and packages.',
+      prompt:'Under a launch deadline, would you buy more inspection, accept scrap, or ship less? Which risk would your client choose?',
+      lesson:'At the leading edge, gate-all-around devices, EUV patterning, yield learning and advanced packaging make capacity and process know-how strategic assets.',
+      consulting:'Allocation, node qualification, packaging capacity and single-source terms can dominate a telecom roadmap—and become central to force-majeure, lost-profit and valuation work.',
+      slot:22, defectRate:.14, time:18, scans:2, scanCost:1.2, cue:.18,
+      task:'5G-A / AI-RAN / advanced switching'
+    }
   ];
-  var POINTS=[1,3,8]; // value per working chip rises as the node shrinks
 
-  // ---------- state ----------
-  var cv=document.getElementById('cv'), ctx=cv.getContext('2d');
-  var stage=document.getElementById('stage');
-  var DPR=Math.min(window.devicePixelRatio||1,2);
-  var W=0,H=0, cx=0,cy=0, R=0, flatY=0;
-  var slots=[], slotSize=40;
-  var ri=0, running=false, tEnd=0, tLeft=0;
-  var totChips=0, totScrap=0, totScore=0, roundFits=[];
-  var pops=[];
+  var cv=document.getElementById('cv'),ctx=cv.getContext('2d'),stage=document.getElementById('stage');
+  var DPR=Math.min(window.devicePixelRatio||1,2), W=0,H=0,S=1,OX=0,OY=0;
+  var ri=0,running=false,tEnd=0,tLeft=0,scanUntil=0;
+  var slots=[],pops=[],results=[];
+  var good=0,bad=0,misses=0,scansUsed=0,totalGood=0,roundScore=0;
+  var cumulativeScore=0,totalGoodTapped=0,totalBadTapped=0;
+  var toastTimer=0,unlockTimer=0;
+
+  function $(id){return document.getElementById(id)}
+  function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+  function pct(v){return Math.round(v*100)+'%'}
+  function fmt(n){return Math.round(n).toLocaleString('en-US')}
+
+  function hashSeed(str){
+    var h=2166136261>>>0;
+    for(var i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)}
+    return h>>>0;
+  }
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  function shuffledIndices(n,rng){var a=[];for(var i=0;i<n;i++)a.push(i);for(var j=n-1;j>0;j--){var k=Math.floor(rng()*(j+1)),q=a[j];a[j]=a[k];a[k]=q}return a}
 
   function fit(){
-    var r=stage.getBoundingClientRect();
-    W=Math.max(240,r.width); H=Math.max(240,r.height);
-    cv.style.width=W+'px'; cv.style.height=H+'px';
-    cv.width=Math.floor(W*DPR); cv.height=Math.floor(H*DPR);
-    ctx.setTransform(DPR,0,0,DPR,0,0);
-    var m=Math.min(W,H);
-    R=m*0.46; cx=W/2; cy=H/2; flatY=cy+R*0.82; // flat near bottom
-    if(running) layout();
+    var r=stage.getBoundingClientRect();W=Math.max(240,r.width);H=Math.max(260,r.height);
+    cv.style.width=W+'px';cv.style.height=H+'px';cv.width=Math.floor(W*DPR);cv.height=Math.floor(H*DPR);
+    S=Math.min(W,H)/LOG;OX=(W-LOG*S)/2;OY=(H-LOG*S)/2;
+    draw(performance.now());
   }
   window.addEventListener('resize',fit);
 
-  function layout(){
-    slots=[];
-    var s=ROUNDS[ri].slot; // base px at ~min dimension 640
-    var scale=Math.min(W,H)/640; slotSize=Math.max(9,s*scale);
-    var d=slotSize*1.32;
-    var defRate=ROUNDS[ri].defect;
-    for(var y=cy-R+slotSize; y<=flatY-slotSize*0.4; y+=d){
-      for(var x=cx-R+slotSize; x<=cx+R-slotSize; x+=d){
-        var dx=x-cx, dy=y-cy;
-        if(dx*dx+dy*dy <= (R-slotSize*0.55)*(R-slotSize*0.55) && y<=flatY-slotSize*0.4){
-          slots.push({x:x,y:y,filled:false,defect:Math.random()<defRate});
+  function buildRound(){
+    slots=[];pops=[];var r=ROUNDS[ri],d=r.slot*1.28,row=0;
+    for(var y=CY-RAD+r.slot*.82;y<=FLAT-r.slot*.42;y+=d,row++){
+      var shift=(row%2)*d*.5;
+      for(var x=CX-RAD+r.slot*.82-shift;x<=CX+RAD-r.slot*.82;x+=d){
+        var dx=x-CX,dy=y-CY;
+        if(dx*dx+dy*dy<=(RAD-r.slot*.55)*(RAD-r.slot*.55)&&y<=FLAT-r.slot*.4){
+          slots.push({x:x,y:y,defect:false,processed:false,result:'',cuePhase:0});
         }
       }
     }
-    roundFits[ri]=slots.length;
+    var rng=mulberry32(hashSeed(SESSION_SEED+':round:'+ri));
+    var order=shuffledIndices(slots.length,rng),nDef=Math.max(1,Math.round(slots.length*r.defectRate));
+    for(var i=0;i<nDef;i++)slots[order[i]].defect=true;
+    for(var j=0;j<slots.length;j++)slots[j].cuePhase=rng()*Math.PI*2;
+    totalGood=slots.length-nDef;good=0;bad=0;misses=0;scansUsed=0;roundScore=0;scanUntil=0;
+    updateHud();updateScanButton();
   }
 
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    // wafer disc
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(cx,cy,R,0,Math.PI*2);
-    ctx.closePath();
-    ctx.clip();
-    var g=ctx.createRadialGradient(cx-R*0.3,cy-R*0.35,R*0.1,cx,cy,R*1.1);
-    g.addColorStop(0,'#e7edf2'); g.addColorStop(.55,'#b9c4ce'); g.addColorStop(1,'#8a97a3');
-    ctx.fillStyle=g; ctx.fillRect(cx-R,cy-R,R*2,R*2);
-    // flat edge (cover below flatY)
-    ctx.fillStyle='#02243f'; ctx.fillRect(cx-R,flatY,R*2,R*2);
-    ctx.restore();
-    // rim
-    ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.lineWidth=2; ctx.strokeStyle='#5b6b78'; ctx.stroke();
-    // notch flat line
-    ctx.beginPath(); ctx.moveTo(cx-Math.sqrt(Math.max(0,R*R-(flatY-cy)*(flatY-cy))),flatY);
-    ctx.lineTo(cx+Math.sqrt(Math.max(0,R*R-(flatY-cy)*(flatY-cy))),flatY);
-    ctx.lineWidth=2; ctx.strokeStyle='#5b6b78'; ctx.stroke();
+  function scoreNow(){
+    if(!totalGood)return 0;
+    var unit=MAX_SCORE/totalGood;
+    var shipped=good*unit,penalty=bad*unit*2.5;
+    return clamp(Math.round(shipped-penalty),0,MAX_SCORE);
+  }
+  function breakdown(){
+    var unit=MAX_SCORE/Math.max(1,totalGood);
+    return {shipped:Math.round(good*unit),penalty:Math.round(bad*unit*2.5)};
+  }
+  function updateHud(){
+    roundScore=scoreNow();$('hudScore').textContent=fmt(cumulativeScore+roundScore);
+    $('hudGood').textContent=fmt(totalGoodTapped+good);$('hudScrap').textContent=fmt(totalBadTapped+bad);
+  }
+  function updateScanButton(){
+    var b=$('scanBtn'),r=ROUNDS[ri],left=Math.max(0,r.scans-scansUsed),active=performance.now()<scanUntil;
+    b.disabled=!running||left<=0||active;
+    if(!running)b.innerHTML='<b>Inspection pulse</b> · waiting';
+    else if(active)b.innerHTML='<b>Inspecting…</b> defects revealed';
+    else if(left>0)b.innerHTML='<b>Inspection pulse</b> · '+left+' left · costs '+r.scanCost.toFixed(1)+'s';
+    else b.innerHTML='<b>Inspection used</b> · no pulses left';
+  }
 
-    var hs=slotSize*0.5, r2=Math.max(1.5,slotSize*0.14);
+  function logicalPoint(e){
+    var rect=cv.getBoundingClientRect(),p=e.touches?e.touches[0]:e;
+    return {x:(p.clientX-rect.left-OX)/S,y:(p.clientY-rect.top-OY)/S};
+  }
+  function onTap(e){
+    if(!running)return;e.preventDefault();var p=logicalPoint(e),r=ROUNDS[ri],best=-1,bd=Infinity;
+    var hit=Math.max(r.slot*.68,13/Math.max(.35,S));
     for(var i=0;i<slots.length;i++){
-      var sN=slots[i], x=sN.x, y=sN.y;
-      if(sN.filled){
-        // cast shadow off the wafer surface
-        ctx.save();
-        ctx.shadowColor='rgba(0,20,40,0.55)'; ctx.shadowBlur=hs*0.5; ctx.shadowOffsetX=hs*0.12; ctx.shadowOffsetY=hs*0.22;
-        var gf=ctx.createLinearGradient(x-hs*0.9,y-hs*0.9,x+hs*0.9,y+hs*0.9);
-        gf.addColorStop(0,'#1c8fe0'); gf.addColorStop(.5,'#0067B1'); gf.addColorStop(1,'#004a80');
-        ctx.fillStyle=gf; roundRect(x-hs*0.9,y-hs*0.9,hs*1.8,hs*1.8,r2); ctx.fill();
-        ctx.restore();
-        ctx.strokeStyle='#00C9D4'; ctx.lineWidth=Math.max(1,slotSize*0.06); roundRect(x-hs*0.9,y-hs*0.9,hs*1.8,hs*1.8,r2); ctx.stroke();
-        // silicon die detail: scribe lines + bond-pad corners
-        ctx.strokeStyle='#00c9d488'; ctx.lineWidth=1; ctx.beginPath();
-        ctx.moveTo(x,y-hs*0.9); ctx.lineTo(x,y+hs*0.9); ctx.moveTo(x-hs*0.9,y); ctx.lineTo(x+hs*0.9,y); ctx.stroke();
-        ctx.fillStyle='#bff5fa';
-        var pc=hs*0.72;
-        [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(c){ ctx.beginPath(); ctx.arc(x+c[0]*pc,y+c[1]*pc,Math.max(0.6,hs*0.08),0,Math.PI*2); ctx.fill(); });
-      } else if(sN.defect){
-        ctx.save();
-        ctx.shadowColor='rgba(0,20,40,0.4)'; ctx.shadowBlur=hs*0.4; ctx.shadowOffsetX=hs*0.1; ctx.shadowOffsetY=hs*0.18;
-        ctx.fillStyle='#E1523D'; ctx.beginPath(); ctx.arc(x,y,hs*0.62,0,Math.PI*2); ctx.fill();
-        ctx.restore();
-        ctx.fillStyle='#ffd2c8'; ctx.beginPath(); ctx.arc(x-hs*0.18,y-hs*0.18,hs*0.16,0,Math.PI*2); ctx.fill();
-      } else {
-        // unfabbed silicon die: raised block with cast shadow, bevel and circuit texture
-        ctx.save();
-        ctx.shadowColor='rgba(0,20,40,0.5)'; ctx.shadowBlur=hs*0.45; ctx.shadowOffsetX=hs*0.1; ctx.shadowOffsetY=hs*0.2;
-        var gd=ctx.createLinearGradient(x-hs*0.82,y-hs*0.82,x+hs*0.82,y+hs*0.82);
-        gd.addColorStop(0,'#a3b0bb'); gd.addColorStop(.5,'#7f8d99'); gd.addColorStop(1,'#616e79');
-        ctx.fillStyle=gd; roundRect(x-hs*0.82,y-hs*0.82,hs*1.64,hs*1.64,r2); ctx.fill();
-        ctx.restore();
-        // top bevel highlight
-        ctx.strokeStyle='#c9d3db77'; ctx.lineWidth=1;
-        roundRect(x-hs*0.82,y-hs*0.82,hs*1.64,hs*1.64,r2); ctx.stroke();
-        // inset die face
-        ctx.fillStyle='#eef2f5'; roundRect(x-hs*0.66,y-hs*0.66,hs*1.32,hs*1.32,r2*0.8); ctx.fill();
-        // faint circuit trace texture so it reads as silicon, not a button
-        ctx.strokeStyle='#c3cdd6'; ctx.lineWidth=Math.max(0.5,slotSize*0.03);
-        ctx.beginPath();
-        ctx.moveTo(x-hs*0.66,y-hs*0.22); ctx.lineTo(x-hs*0.1,y-hs*0.22); ctx.lineTo(x-hs*0.1,y+hs*0.66);
-        ctx.moveTo(x+hs*0.1,y-hs*0.66); ctx.lineTo(x+hs*0.1,y+hs*0.15); ctx.lineTo(x+hs*0.66,y+hs*0.15);
-        ctx.stroke();
-        // corner bond pads
-        ctx.fillStyle='#b7c1ca';
-        var pc2=hs*0.7;
-        [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(c){ ctx.fillRect(x+c[0]*pc2-hs*0.06,y+c[1]*pc2-hs*0.06,hs*0.12,hs*0.12); });
+      if(slots[i].processed)continue;var dx=slots[i].x-p.x,dy=slots[i].y-p.y,dd=dx*dx+dy*dy;
+      if(dd<hit*hit&&dd<bd){bd=dd;best=i}
+    }
+    if(best<0){
+      misses++;tEnd-=350;pops.push({x:p.x,y:p.y,bad:true,miss:true,t0:performance.now()});showToast('Miss · −0.3s',true);return;
+    }
+    var s=slots[best];s.processed=true;
+    if(s.defect){s.result='bad';bad++;pops.push({x:s.x,y:s.y,bad:true,t0:performance.now()});showToast('Scrap / rework',true)}
+    else{s.result='good';good++;pops.push({x:s.x,y:s.y,bad:false,t0:performance.now()});}
+    updateHud();
+    if(good>=totalGood){running=false;setTimeout(endRound,260)}
+  }
+  cv.addEventListener('pointerdown',onTap,{passive:false});
+
+  function scan(){
+    if(!running)return;var r=ROUNDS[ri];if(scansUsed>=r.scans||performance.now()<scanUntil)return;
+    scansUsed++;tEnd-=r.scanCost*1000;scanUntil=performance.now()+1700;showToast('Inspection pulse · −'+r.scanCost.toFixed(1)+'s',false);updateScanButton();
+  }
+  $('scanBtn').addEventListener('click',scan);
+
+  function showToast(text,isBad){
+    var el=$('toast');el.textContent=text;el.className='toast show '+(isBad?'bad':'good');clearTimeout(toastTimer);
+    toastTimer=setTimeout(function(){el.className='toast'},800);
+  }
+
+  function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+  function draw(now){
+    ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.setTransform(DPR*S,0,0,DPR*S,DPR*OX,DPR*OY);
+    // wafer
+    ctx.save();ctx.beginPath();ctx.arc(CX,CY,RAD,0,Math.PI*2);ctx.clip();
+    var g=ctx.createRadialGradient(CX-RAD*.32,CY-RAD*.35,RAD*.08,CX,CY,RAD*1.1);
+    g.addColorStop(0,'#edf2f5');g.addColorStop(.52,'#bdc7cf');g.addColorStop(1,'#86939f');ctx.fillStyle=g;ctx.fillRect(CX-RAD,CY-RAD,RAD*2,RAD*2);
+    ctx.fillStyle='#02243f';ctx.fillRect(CX-RAD,FLAT,RAD*2,RAD);ctx.restore();
+    ctx.beginPath();ctx.arc(CX,CY,RAD,0,Math.PI*2);ctx.lineWidth=2;ctx.strokeStyle='#61717e';ctx.stroke();
+    var half=Math.sqrt(Math.max(0,RAD*RAD-(FLAT-CY)*(FLAT-CY)));ctx.beginPath();ctx.moveTo(CX-half,FLAT);ctx.lineTo(CX+half,FLAT);ctx.stroke();
+
+    var r=ROUNDS[ri]||ROUNDS[0],scanActive=now<scanUntil,hs=r.slot*.5;
+    for(var i=0;i<slots.length;i++){
+      var s=slots[i],x=s.x,y=s.y,rad=Math.max(1.3,r.slot*.12);
+      if(s.processed&&s.result==='good'){
+        ctx.save();ctx.shadowColor='rgba(0,20,40,.5)';ctx.shadowBlur=hs*.45;ctx.shadowOffsetX=hs*.1;ctx.shadowOffsetY=hs*.18;
+        var gf=ctx.createLinearGradient(x-hs,y-hs,x+hs,y+hs);gf.addColorStop(0,'#2d9fe8');gf.addColorStop(.52,'#0067b1');gf.addColorStop(1,'#004574');ctx.fillStyle=gf;rr(x-hs*.84,y-hs*.84,hs*1.68,hs*1.68,rad);ctx.fill();ctx.restore();
+        ctx.strokeStyle='#00c9d4';ctx.lineWidth=Math.max(1,r.slot*.045);rr(x-hs*.84,y-hs*.84,hs*1.68,hs*1.68,rad);ctx.stroke();
+        ctx.strokeStyle='#9af4f788';ctx.lineWidth=Math.max(.5,r.slot*.025);ctx.beginPath();ctx.moveTo(x,y-hs*.82);ctx.lineTo(x,y+hs*.82);ctx.moveTo(x-hs*.82,y);ctx.lineTo(x+hs*.82,y);ctx.stroke();
+      }else if(s.processed&&s.result==='bad'){
+        ctx.fillStyle='#e1523d';rr(x-hs*.76,y-hs*.76,hs*1.52,hs*1.52,rad);ctx.fill();ctx.strokeStyle='#ffd0c7';ctx.lineWidth=Math.max(1,r.slot*.07);ctx.beginPath();ctx.moveTo(x-hs*.35,y-hs*.35);ctx.lineTo(x+hs*.35,y+hs*.35);ctx.moveTo(x+hs*.35,y-hs*.35);ctx.lineTo(x-hs*.35,y+hs*.35);ctx.stroke();
+      }else{
+        ctx.save();ctx.shadowColor='rgba(0,20,40,.46)';ctx.shadowBlur=hs*.35;ctx.shadowOffsetX=hs*.08;ctx.shadowOffsetY=hs*.16;
+        var gd=ctx.createLinearGradient(x-hs,y-hs,x+hs,y+hs);gd.addColorStop(0,'#f4f7f9');gd.addColorStop(.52,'#d9e0e5');gd.addColorStop(1,'#aeb9c2');ctx.fillStyle=gd;rr(x-hs*.78,y-hs*.78,hs*1.56,hs*1.56,rad);ctx.fill();ctx.restore();
+        ctx.strokeStyle='#8d9ca8';ctx.lineWidth=Math.max(.55,r.slot*.025);rr(x-hs*.78,y-hs*.78,hs*1.56,hs*1.56,rad);ctx.stroke();
+        ctx.strokeStyle='#bac5cd';ctx.lineWidth=Math.max(.45,r.slot*.018);ctx.beginPath();ctx.moveTo(x-hs*.6,y-hs*.12);ctx.lineTo(x-hs*.05,y-hs*.12);ctx.lineTo(x-hs*.05,y+hs*.58);ctx.moveTo(x+hs*.09,y-hs*.58);ctx.lineTo(x+hs*.09,y+hs*.16);ctx.lineTo(x+hs*.58,y+hs*.16);ctx.stroke();
+        if(s.defect){
+          if(scanActive){
+            ctx.fillStyle='rgba(225,82,61,.82)';rr(x-hs*.79,y-hs*.79,hs*1.58,hs*1.58,rad);ctx.fill();ctx.strokeStyle='#ffd0c7';ctx.lineWidth=Math.max(1,r.slot*.06);rr(x-hs*.79,y-hs*.79,hs*1.58,hs*1.58,rad);ctx.stroke();
+          }else{
+            var q=r.cue,ang=s.cuePhase,len=hs*(.28+.18*q);ctx.save();ctx.translate(x,y);ctx.rotate(ang);ctx.strokeStyle='rgba(188,72,55,'+Math.min(1,q*2.2)+')';ctx.lineWidth=Math.max(.54,r.slot*.032*q);ctx.beginPath();ctx.moveTo(-len,-len*.2);ctx.lineTo(-len*.18,len*.08);ctx.lineTo(len*.18,-len*.12);ctx.lineTo(len,len*.18);ctx.stroke();ctx.restore();
+          }
+        }
       }
     }
-    // pops
     for(var k=pops.length-1;k>=0;k--){
-      var pp=pops[k]; pp.t+=1;
-      var a=1-pp.t/12;
-      if(a<=0){pops.splice(k,1);continue;}
-      ctx.globalAlpha=a;
-      ctx.strokeStyle=pp.bad?'#E1523D':'#00C9D4'; ctx.lineWidth=2;
-      ctx.beginPath(); ctx.arc(pp.x,pp.y,(pp.bad?slotSize*0.5:slotSize*0.4)+pp.t*2,0,Math.PI*2); ctx.stroke();
-      ctx.globalAlpha=1;
+      var pp=pops[k],age=(now-pp.t0)/650;if(age>=1){pops.splice(k,1);continue}ctx.globalAlpha=1-age;ctx.strokeStyle=pp.bad?'#e1523d':'#00c9d4';ctx.lineWidth=2;ctx.beginPath();ctx.arc(pp.x,pp.y,(pp.miss?8:r.slot*.35)+age*18,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;
     }
   }
-  function roundRect(x,y,w,h,r){ ctx.beginPath();
-    ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
-    ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
-
-  // ---------- interaction ----------
-  function onTap(e){
-    if(!running) return;
-    e.preventDefault();
-    var rect=cv.getBoundingClientRect();
-    var px=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
-    var py=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
-    var best=-1, bd=slotSize*slotSize*0.36;
-    for(var i=0;i<slots.length;i++){
-      if(slots[i].filled) continue;
-      var dx=slots[i].x-px, dy=slots[i].y-py, dd=dx*dx+dy*dy;
-      if(dd<bd){bd=dd;best=i;}
-    }
-    if(best<0) return; // missed all — no penalty, just tension
-    var sN=slots[best];
-    if(sN.defect){
-      totScrap++; pops.push({x:sN.x,y:sN.y,t:0,bad:true});
-      sN.filled=true; sN.scr=true; // consume so you can't tap again
-    } else {
-      sN.filled=true; totChips++; totScore+=POINTS[ri];
-      pops.push({x:sN.x,y:sN.y,t:0,bad:false});
-    }
-    updateHud();
-  }
-  cv.addEventListener('mousedown',onTap);
-  cv.addEventListener('touchstart',onTap,{passive:false});
-
-  function updateHud(){
-    document.getElementById('hudScore').textContent=totScore;
-    document.getElementById('hudScrap').textContent=totScrap;
-  }
-
-  // ---------- flow ----------
-  function showRoundIntro(){
-    var r=ROUNDS[ri];
-    document.getElementById('rIntroStep').textContent=r.step;
-    document.getElementById('rIntroTitle').textContent=r.year+' · '+r.node;
-    document.getElementById('rIntroBlurb').textContent=r.blurb;
-    document.getElementById('rIntroTel').textContent=r.tel;
-    show('ovRound');
-  }
-  function startRound(){
-    hideAll();
-    var r=ROUNDS[ri];
-    document.getElementById('nodeLbl').textContent=r.node;
-    document.getElementById('nodeYr').textContent=r.year;
-    document.getElementById('nodeTask').innerHTML='Fabbing: <b>'+telTask(ri)+'</b>';
-    fit(); layout();
-    running=true; tLeft=r.time; tEnd=performance.now()+r.time*1000;
-    loop();
-  }
-  function telTask(i){ return ['logic & early RF','3G/4G RF + baseband','5G/6G RF, GaN & optical'][i]; }
 
   function loop(now){
-    now=now||performance.now();
-    if(running){
-      tLeft=Math.max(0,(tEnd-now)/1000);
-      var r=ROUNDS[ri];
-      document.getElementById('hudTime').textContent=tLeft.toFixed(1);
-      var bar=document.getElementById('timerBar');
-      bar.querySelector('i').style.width=(tLeft/r.time*100)+'%';
-      bar.classList.toggle('low',tLeft<5);
-      draw();
-      if(tLeft<=0){ running=false; endRound(); return; }
-      requestAnimationFrame(loop);
-    }
+    now=now||performance.now();if(!running){draw(now);return}
+    tLeft=Math.max(0,(tEnd-now)/1000);$('hudTime').textContent=tLeft.toFixed(1);
+    var r=ROUNDS[ri],bar=$('timerBar');bar.querySelector('i').style.width=(tLeft/r.time*100)+'%';bar.classList.toggle('low',tLeft<4.5);
+    updateScanButton();draw(now);
+    if(tLeft<=0){running=false;endRound();return}requestAnimationFrame(loop);
+  }
+
+  function showRoundIntro(){
+    var r=ROUNDS[ri];$('rIntroStep').textContent=r.step;$('rIntroTitle').textContent=r.year+' · '+r.node;$('rIntroBlurb').textContent=r.blurb;$('rIntroObjective').textContent=r.objective;$('rIntroTel').textContent=r.tel;show('ovRound');
+  }
+  function startRound(){
+    hideAll();buildRound();var r=ROUNDS[ri];$('nodeLbl').textContent=r.node;$('nodeYr').textContent=r.year;$('nodeTask').innerHTML='Fabbing: <b>'+r.task+'</b>';
+    running=true;tLeft=r.time;tEnd=performance.now()+r.time*1000;$('hudTime').textContent=r.time.toFixed(1);$('timerBar').querySelector('i').style.width='100%';$('timerBar').classList.remove('low');updateScanButton();requestAnimationFrame(loop);
+  }
+  function profileFor(capture,yield_,scans,maxScans){
+    if(capture>=.72&&yield_>=.93)return 'Balanced fab · high output, controlled scrap';
+    if(yield_>=.96&&capture<.55)return 'Quality-first · strong yield, unused capacity';
+    if(capture>=.72&&yield_<.88)return 'Throughput-first · high output, expensive scrap';
+    if(scans>=maxScans&&yield_>=.92)return 'Inspection-led · careful, time-intensive';
+    return 'Adaptive fab · mixed strategy';
   }
   function endRound(){
-    if(ri<ROUNDS.length-1){ ri++; showRoundIntro(); }
-    else finish();
+    running=false;updateScanButton();var r=ROUNDS[ri],processed=good+bad,yield_=processed?good/processed:0,capture=totalGood?good/totalGood:0,b=breakdown(),score=scoreNow();
+    var res={round:ri,good:good,bad:bad,totalGood:totalGood,yield:yield_,capture:capture,shipped:b.shipped,penalty:b.penalty,score:score,scans:scansUsed,misses:misses};results.push(res);
+    cumulativeScore+=score;totalGoodTapped+=good;totalBadTapped+=bad;
+    $('dStep').textContent=r.year+' · '+r.node+' complete';$('dTitle').textContent='You earned '+fmt(score)+' of '+MAX_SCORE.toLocaleString('en-US')+' points';
+    $('dPoints').textContent=fmt(score);$('dYield').textContent=pct(yield_);$('dCapture').textContent=pct(capture);$('dProfile').textContent=profileFor(capture,yield_,scansUsed,r.scans);
+    $('dGood').textContent=fmt(good)+' / '+fmt(totalGood);$('dShip').textContent='+'+fmt(b.shipped);$('dPenalty').textContent='−'+fmt(b.penalty);$('dMissed').textContent=fmt(Math.max(0,totalGood-good));
+    $('dPrompt').textContent=r.prompt;$('dLesson').textContent=r.lesson;$('dConsulting').textContent=r.consulting;
+    show('ovDebrief');startUnlock(ri===ROUNDS.length-1);
   }
+  function startUnlock(isLast){
+    clearInterval(unlockTimer);var n=6,b=$('btnNext');b.disabled=true;b.textContent='Discuss first · '+n;
+    unlockTimer=setInterval(function(){n--;if(n>0){b.textContent='Discuss first · '+n}else{clearInterval(unlockTimer);b.disabled=false;b.textContent=isLast?'See final result →':'Continue when facilitator says go →'}},1000);
+  }
+  function nextFromDebrief(){if(ri<ROUNDS.length-1){ri++;showRoundIntro()}else finish()}
+
   function finish(){
-    var yield_=totChips+totScrap>0?Math.round(totChips/(totChips+totScrap)*100):0;
-    animCount('endChips',totChips); animCount('endScore',totScore);
-    document.getElementById('endYield').textContent=yield_+'%';
+    var n=results.length||1,avgYield=results.reduce(function(a,r){return a+r.yield},0)/n,avgCapture=results.reduce(function(a,r){return a+r.capture},0)/n;
+    var p=profileFor(avgCapture,avgYield,results.reduce(function(a,r){return a+r.scans},0),ROUNDS.reduce(function(a,r){return a+r.scans},0));
+    $('endScore').textContent=fmt(cumulativeScore)+' / '+fmt(MAX_SCORE*ROUNDS.length);$('endYield').textContent=pct(avgYield);$('endCapture').textContent=pct(avgCapture);$('endProfile').textContent=p;
+    $('endHeadline').textContent=cumulativeScore>=2400?'High-performing fab':cumulativeScore>=1750?'Competitive fab':'Your fab profile';
+    $('endFoot').textContent='Working dies: '+fmt(totalGoodTapped)+' · Scrap events: '+fmt(totalBadTapped)+' · Session seed: '+SESSION_SEED;
     show('ovEnd');
   }
-  function animCount(id,to){
-    var el=document.getElementById(id); if(reduce){el.textContent=to;return;}
-    var t0=performance.now();
-    function st(n){var p=Math.min(1,(n-t0)/600); el.textContent=Math.round(to*p); if(p<1)requestAnimationFrame(st);}
-    requestAnimationFrame(st);
+
+  function copyResult(){
+    var n=results.length||1,ay=results.reduce(function(a,r){return a+r.yield},0)/n,ac=results.reduce(function(a,r){return a+r.capture},0)/n;
+    var text='Fab Rush: '+cumulativeScore+'/'+(MAX_SCORE*ROUNDS.length)+' points | '+pct(ay)+' avg yield | '+pct(ac)+' capacity captured | '+totalBadTapped+' scrap';
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){var b=$('btnCopy');b.textContent='Copied';setTimeout(function(){b.textContent='Copy result'},1200)})}
+    else{window.prompt('Copy your result:',text)}
   }
 
-  // ---------- overlays ----------
-  function show(id){ hideAll(); document.getElementById(id).hidden=false; }
-  function hideAll(){ ['ovStart','ovRound','ovEnd'].forEach(function(i){document.getElementById(i).hidden=true;}); }
-
+  function show(id){hideAll();$(id).hidden=false}
+  function hideAll(){['ovStart','ovRound','ovDebrief','ovEnd'].forEach(function(id){$(id).hidden=true})}
   function newGame(){
-    ri=0; totChips=0; totScrap=0; totScore=0; roundFits=[]; pops=[];
-    updateHud(); document.getElementById('hudTime').textContent='0.0';
-    showRoundIntro();
+    clearInterval(unlockTimer);ri=0;results=[];cumulativeScore=0;totalGoodTapped=0;totalBadTapped=0;good=bad=0;slots=[];updateHud();$('hudTime').textContent='0.0';showRoundIntro();draw(performance.now());
   }
 
-  document.getElementById('btnStart').addEventListener('click',newGame);
-  document.getElementById('btnGo').addEventListener('click',startRound);
-  document.getElementById('btnAgain').addEventListener('click',newGame);
+  $('btnStart').addEventListener('click',newGame);$('btnGo').addEventListener('click',startRound);$('btnNext').addEventListener('click',nextFromDebrief);$('btnAgain').addEventListener('click',newGame);$('btnCopy').addEventListener('click',copyResult);
   document.addEventListener('keydown',function(e){
     if(e.code==='Space'){
-      if(!document.getElementById('ovStart').hidden){e.preventDefault();newGame();}
-      else if(!document.getElementById('ovRound').hidden){e.preventDefault();startRound();}
-    }
+      if(!$('ovStart').hidden){e.preventDefault();newGame()}else if(!$('ovRound').hidden){e.preventDefault();startRound()}else if(!$('ovDebrief').hidden&&!$('btnNext').disabled){e.preventDefault();nextFromDebrief()}
+    }else if(e.key.toLowerCase()==='i'&&running){scan()}
   });
-
-  fit();
+  fit();draw(performance.now());
 })();
 </script>
 </body>
