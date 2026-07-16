@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <meta name="theme-color" content="#022c4f" />
-<title>Fab Rush — Moore's Law Challenge</title>
+<title>JP Professional Interest — Moore's Law Challenge</title>
 <style>
   :root{
     --navy:#022c4f; --navy2:#003763; --blue:#0067b1; --cyan:#00c9d4;
@@ -418,7 +418,7 @@
 
   function copyResult(){
     var n=results.length||1,ay=results.reduce(function(a,r){return a+r.yield},0)/n,ac=results.reduce(function(a,r){return a+r.capture},0)/n;
-    var text='Fab Rush: '+cumulativeScore+'/'+(MAX_SCORE*ROUNDS.length)+' points | '+pct(ay)+' avg yield | '+pct(ac)+' capacity captured | '+totalBadTapped+' scrap';
+    var text='Moore\'s Law Challenge: '+cumulativeScore+'/'+(MAX_SCORE*ROUNDS.length)+' points | '+pct(ay)+' avg yield | '+pct(ac)+' capacity captured | '+totalBadTapped+' scrap';
     if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){var b=$('btnCopy');b.textContent='Copied';setTimeout(function(){b.textContent='Copy result'},1200)})}
     else{window.prompt('Copy your result:',text)}
   }
