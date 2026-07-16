@@ -113,16 +113,15 @@
   <div class="stage" id="stage">
     <canvas id="cv" aria-label="Interactive semiconductor wafer game"></canvas>
     <div class="toast" id="toast" aria-live="polite"></div>
-    <div class="hint" id="hint">Tap dies you believe will pass · <span class="cyan">inspection</span> briefly reveals latent defects</div>
-    <div class="controls"><button class="scan" id="scanBtn" disabled><b>Inspection pulse</b> · waiting</button></div>
+    <div class="hint" id="hint">Tap dies you believe will pass inspection</div>
   </div>
 </div>
 
 <div class="overlay" id="ovStart">
   <div class="panel">
-    <div class="eyebrow">Professional Interest · Interactive</div>
+    <div class="eyebrow">JP Professional Interest</div>
     <h1>Moore's Law Challenge<span class="sub">Maximize shipped value - not just yield</span></h1>
-    <p class="lede">Run the same-function chip across three technology eras. Tap the dies you think will pass test. Some defects are <b>latent</b>, so you can spend precious time on a limited inspection pulse—or accept more scrap and move faster.</p>
+    <p class="lede">Run the same-function chip across three technology eras. Tap the dies you think will pass test. Some defects are harder to spot, requiring careful judgment and speed.</p>
     <div class="formula"><span class="plus">POINTS = SHIPPED VALUE</span> <span class="minus">− SCRAP / REWORK</span></div>
     <div class="note">
       <span class="h">Why the scoring changed</span>
@@ -209,44 +208,44 @@
   var ROUNDS=[
     {
       year:'1997', node:'250 nm', step:'Round 1 of 3 · Relative process simplicity',
-      blurb:'Large visual targets and a relatively forgiving process window. The defects are visible if you slow down—but every second still costs output.',
-      objective:'Balance speed and accuracy. You have one inspection pulse, but the visual cues are intentionally easier in this era.',
+      blurb:'Large visual targets and a relatively forgiving process window. The defects are visible if you look carefully—but every second still costs output.',
+      objective:'Balance speed and accuracy. The visual cues are intentionally easier in this era.',
       tel:'This era powered 2G networks and early digital base-station logic. The lesson is not that old chips were simple—it is that later integration raised the number of trade-offs.',
-      prompt:'What did you optimize first: speed, accuracy, or inspection? What information did you wish you had?',
+      prompt:'What did you optimize first: speed or accuracy? What information did you wish you had?',
       lesson:'At larger design rules, manufacturing tolerances are relatively wider. The economic focus is often stable output, cost and continuity—not simply the smallest possible node.',
       consulting:'A telecom product may be better served by a mature, resilient process than by leading-edge silicon. In diligence, ask whether the roadmap truly requires the newest node.',
-      slot:64, defectRate:.06, time:16, scans:1, scanCost:1.2, cue:.88,
+      slot:64, defectRate:.06, time:16, cue:.88,
       task:'2G / early digital radio silicon'
     },
     {
       year:'2006', node:'90 nm', step:'Round 2 of 3 · Integration and power trade-offs',
       blurb:'More dies, tighter spacing and subtler defects. Throughput rises, but leakage, heat and process variation begin to matter much more.',
-      objective:'Use up to two inspection pulses. High yield with low capacity capture will score poorly; blind speed creates expensive scrap.',
+      objective:'Accuracy matters more with tighter spacing. High yield with low capacity capture will score poorly; guessing fast creates expensive scrap.',
       tel:'90 nm-class processes sat behind 3G, early smartphones and increasingly integrated baseband and network processors.',
-      prompt:'What changed when the wafer became crowded? Did you change strategy—or just tap faster?',
+      prompt:'What changed when the wafer became crowded? Did you adjust your tapping strategy?',
       lesson:'By the mid-2000s, scaling was no longer only about fitting more transistors. Power, leakage, interconnect and process control became central design constraints.',
       consulting:'More integration can reduce unit cost while increasing IP, supplier and qualification dependencies. That shifts both deal diligence and dispute exposure.',
-      slot:38, defectRate:.10, time:17, scans:2, scanCost:1.2, cue:.48,
+      slot:38, defectRate:.10, time:17, cue:.48,
       task:'3G / early-4G baseband and network chips'
     },
     {
       year:'2025', node:'2 nm', step:'Round 3 of 3 · Leading-edge yield ramp',
       blurb:'The node name is a generation label, not a literal die size. Here it represents a same-function design with far more density, much tighter tolerances and a difficult early yield ramp.',
-      objective:'You cannot process everything. Decide when inspection is worth the time and how much scrap you will accept to capture scarce capacity.',
+      objective:'You cannot process everything. Decide how much scrap you will accept to capture scarce capacity—and tap carefully under time pressure.',
       tel:'Leading-edge logic supports 5G-Advanced, AI-RAN and high-end switching, while RF, power and optical functions often mix several process technologies and packages.',
-      prompt:'Under a launch deadline, would you buy more inspection, accept scrap, or ship less? Which risk would your client choose?',
+      prompt:'Under a launch deadline, would you accept scrap, ship less, or take more time to tap carefully? Which risk would your client choose?',
       lesson:'At the leading edge, gate-all-around devices, EUV patterning, yield learning and advanced packaging make capacity and process know-how strategic assets.',
       consulting:'Allocation, node qualification, packaging capacity and single-source terms can dominate a telecom roadmap—and become central to force-majeure, lost-profit and valuation work.',
-      slot:22, defectRate:.14, time:18, scans:2, scanCost:1.2, cue:.18,
+      slot:22, defectRate:.14, time:18, cue:.18,
       task:'5G-A / AI-RAN / advanced switching'
     }
   ];
 
   var cv=document.getElementById('cv'),ctx=cv.getContext('2d'),stage=document.getElementById('stage');
   var DPR=Math.min(window.devicePixelRatio||1,2), W=0,H=0,S=1,OX=0,OY=0;
-  var ri=0,running=false,tEnd=0,tLeft=0,scanUntil=0;
+  var ri=0,running=false,tEnd=0,tLeft=0;
   var slots=[],pops=[],results=[];
-  var good=0,bad=0,misses=0,scansUsed=0,totalGood=0,roundScore=0;
+  var good=0,bad=0,misses=0,totalGood=0,roundScore=0;
   var cumulativeScore=0,totalGoodTapped=0,totalBadTapped=0;
   var toastTimer=0,unlockTimer=0;
 
@@ -286,8 +285,8 @@
     var order=shuffledIndices(slots.length,rng),nDef=Math.max(1,Math.round(slots.length*r.defectRate));
     for(var i=0;i<nDef;i++)slots[order[i]].defect=true;
     for(var j=0;j<slots.length;j++)slots[j].cuePhase=rng()*Math.PI*2;
-    totalGood=slots.length-nDef;good=0;bad=0;misses=0;scansUsed=0;roundScore=0;scanUntil=0;
-    updateHud();updateScanButton();
+    totalGood=slots.length-nDef;good=0;bad=0;misses=0;roundScore=0;
+    updateHud();
   }
 
   function scoreNow(){
@@ -303,14 +302,6 @@
   function updateHud(){
     roundScore=scoreNow();$('hudScore').textContent=fmt(cumulativeScore+roundScore);
     $('hudGood').textContent=fmt(totalGoodTapped+good);$('hudScrap').textContent=fmt(totalBadTapped+bad);
-  }
-  function updateScanButton(){
-    var b=$('scanBtn'),r=ROUNDS[ri],left=Math.max(0,r.scans-scansUsed),active=performance.now()<scanUntil;
-    b.disabled=!running||left<=0||active;
-    if(!running)b.innerHTML='<b>Inspection pulse</b> · waiting';
-    else if(active)b.innerHTML='<b>Inspecting…</b> defects revealed';
-    else if(left>0)b.innerHTML='<b>Inspection pulse</b> · '+left+' left · costs '+r.scanCost.toFixed(1)+'s';
-    else b.innerHTML='<b>Inspection used</b> · no pulses left';
   }
 
   function logicalPoint(e){
@@ -335,11 +326,6 @@
   }
   cv.addEventListener('pointerdown',onTap,{passive:false});
 
-  function scan(){
-    if(!running)return;var r=ROUNDS[ri];if(scansUsed>=r.scans||performance.now()<scanUntil)return;
-    scansUsed++;tEnd-=r.scanCost*1000;scanUntil=performance.now()+1700;showToast('Inspection pulse · −'+r.scanCost.toFixed(1)+'s',false);updateScanButton();
-  }
-  $('scanBtn').addEventListener('click',scan);
 
   function showToast(text,isBad){
     var el=$('toast');el.textContent=text;el.className='toast show '+(isBad?'bad':'good');clearTimeout(toastTimer);
@@ -358,7 +344,7 @@
     ctx.beginPath();ctx.arc(CX,CY,RAD,0,Math.PI*2);ctx.lineWidth=2;ctx.strokeStyle='#61717e';ctx.stroke();
     var half=Math.sqrt(Math.max(0,RAD*RAD-(FLAT-CY)*(FLAT-CY)));ctx.beginPath();ctx.moveTo(CX-half,FLAT);ctx.lineTo(CX+half,FLAT);ctx.stroke();
 
-    var r=ROUNDS[ri]||ROUNDS[0],scanActive=now<scanUntil,hs=r.slot*.5;
+    var r=ROUNDS[ri]||ROUNDS[0],hs=r.slot*.5;
     for(var i=0;i<slots.length;i++){
       var s=slots[i],x=s.x,y=s.y,rad=Math.max(1.3,r.slot*.12);
       if(s.processed&&s.result==='good'){
@@ -374,11 +360,7 @@
         ctx.strokeStyle='#8d9ca8';ctx.lineWidth=Math.max(.55,r.slot*.025);rr(x-hs*.78,y-hs*.78,hs*1.56,hs*1.56,rad);ctx.stroke();
         ctx.strokeStyle='#bac5cd';ctx.lineWidth=Math.max(.45,r.slot*.018);ctx.beginPath();ctx.moveTo(x-hs*.6,y-hs*.12);ctx.lineTo(x-hs*.05,y-hs*.12);ctx.lineTo(x-hs*.05,y+hs*.58);ctx.moveTo(x+hs*.09,y-hs*.58);ctx.lineTo(x+hs*.09,y+hs*.16);ctx.lineTo(x+hs*.58,y+hs*.16);ctx.stroke();
         if(s.defect){
-          if(scanActive){
-            ctx.fillStyle='rgba(225,82,61,.82)';rr(x-hs*.79,y-hs*.79,hs*1.58,hs*1.58,rad);ctx.fill();ctx.strokeStyle='#ffd0c7';ctx.lineWidth=Math.max(1,r.slot*.06);rr(x-hs*.79,y-hs*.79,hs*1.58,hs*1.58,rad);ctx.stroke();
-          }else{
-            var q=r.cue,ang=s.cuePhase,len=hs*(.28+.18*q);ctx.save();ctx.translate(x,y);ctx.rotate(ang);ctx.strokeStyle='rgba(188,72,55,'+Math.min(1,q*2.2)+')';ctx.lineWidth=Math.max(.54,r.slot*.032*q);ctx.beginPath();ctx.moveTo(-len,-len*.2);ctx.lineTo(-len*.18,len*.08);ctx.lineTo(len*.18,-len*.12);ctx.lineTo(len,len*.18);ctx.stroke();ctx.restore();
-          }
+          var q=r.cue,ang=s.cuePhase,len=hs*(.28+.18*q);ctx.save();ctx.translate(x,y);ctx.rotate(ang);ctx.strokeStyle='rgba(188,72,55,'+Math.min(1,q*2.2)+')';ctx.lineWidth=Math.max(.54,r.slot*.032*q);ctx.beginPath();ctx.moveTo(-len,-len*.2);ctx.lineTo(-len*.18,len*.08);ctx.lineTo(len*.18,-len*.12);ctx.lineTo(len,len*.18);ctx.stroke();ctx.restore();
         }
       }
     }
@@ -391,7 +373,7 @@
     now=now||performance.now();if(!running){draw(now);return}
     tLeft=Math.max(0,(tEnd-now)/1000);$('hudTime').textContent=tLeft.toFixed(1);
     var r=ROUNDS[ri],bar=$('timerBar');bar.querySelector('i').style.width=(tLeft/r.time*100)+'%';bar.classList.toggle('low',tLeft<4.5);
-    updateScanButton();draw(now);
+    draw(now);
     if(tLeft<=0){running=false;endRound();return}requestAnimationFrame(loop);
   }
 
@@ -400,7 +382,7 @@
   }
   function startRound(){
     hideAll();buildRound();var r=ROUNDS[ri];$('nodeLbl').textContent=r.node;$('nodeYr').textContent=r.year;$('nodeTask').innerHTML='Fabbing: <b>'+r.task+'</b>';
-    running=true;tLeft=r.time;tEnd=performance.now()+r.time*1000;$('hudTime').textContent=r.time.toFixed(1);$('timerBar').querySelector('i').style.width='100%';$('timerBar').classList.remove('low');updateScanButton();requestAnimationFrame(loop);
+    running=true;tLeft=r.time;tEnd=performance.now()+r.time*1000;$('hudTime').textContent=r.time.toFixed(1);$('timerBar').querySelector('i').style.width='100%';$('timerBar').classList.remove('low');requestAnimationFrame(loop);
   }
   function profileFor(capture,yield_,scans,maxScans){
     if(capture>=.72&&yield_>=.93)return 'Balanced fab · high output, controlled scrap';
@@ -410,11 +392,11 @@
     return 'Adaptive fab · mixed strategy';
   }
   function endRound(){
-    running=false;updateScanButton();var r=ROUNDS[ri],processed=good+bad,yield_=processed?good/processed:0,capture=totalGood?good/totalGood:0,b=breakdown(),score=scoreNow();
-    var res={round:ri,good:good,bad:bad,totalGood:totalGood,yield:yield_,capture:capture,shipped:b.shipped,penalty:b.penalty,score:score,scans:scansUsed,misses:misses};results.push(res);
+    running=false;var r=ROUNDS[ri],processed=good+bad,yield_=processed?good/processed:0,capture=totalGood?good/totalGood:0,b=breakdown(),score=scoreNow();
+    var res={round:ri,good:good,bad:bad,totalGood:totalGood,yield:yield_,capture:capture,shipped:b.shipped,penalty:b.penalty,score:score,misses:misses};results.push(res);
     cumulativeScore+=score;totalGoodTapped+=good;totalBadTapped+=bad;
     $('dStep').textContent=r.year+' · '+r.node+' complete';$('dTitle').textContent='You earned '+fmt(score)+' of '+MAX_SCORE.toLocaleString('en-US')+' points';
-    $('dPoints').textContent=fmt(score);$('dYield').textContent=pct(yield_);$('dCapture').textContent=pct(capture);$('dProfile').textContent=profileFor(capture,yield_,scansUsed,r.scans);
+    $('dPoints').textContent=fmt(score);$('dYield').textContent=pct(yield_);$('dCapture').textContent=pct(capture);$('dProfile').textContent=profileFor(capture,yield_,0,0);
     $('dGood').textContent=fmt(good)+' / '+fmt(totalGood);$('dShip').textContent='+'+fmt(b.shipped);$('dPenalty').textContent='−'+fmt(b.penalty);$('dMissed').textContent=fmt(Math.max(0,totalGood-good));
     $('dPrompt').textContent=r.prompt;$('dLesson').textContent=r.lesson;$('dConsulting').textContent=r.consulting;
     show('ovDebrief');startUnlock(ri===ROUNDS.length-1);
@@ -427,7 +409,7 @@
 
   function finish(){
     var n=results.length||1,avgYield=results.reduce(function(a,r){return a+r.yield},0)/n,avgCapture=results.reduce(function(a,r){return a+r.capture},0)/n;
-    var p=profileFor(avgCapture,avgYield,results.reduce(function(a,r){return a+r.scans},0),ROUNDS.reduce(function(a,r){return a+r.scans},0));
+    var p=profileFor(avgCapture,avgYield,0,0);
     $('endScore').textContent=fmt(cumulativeScore)+' / '+fmt(MAX_SCORE*ROUNDS.length);$('endYield').textContent=pct(avgYield);$('endCapture').textContent=pct(avgCapture);$('endProfile').textContent=p;
     $('endHeadline').textContent=cumulativeScore>=2400?'High-performing fab':cumulativeScore>=1750?'Competitive fab':'Your fab profile';
     $('endFoot').textContent='Working dies: '+fmt(totalGoodTapped)+' · Scrap events: '+fmt(totalBadTapped)+' · Session seed: '+SESSION_SEED;
@@ -451,7 +433,7 @@
   document.addEventListener('keydown',function(e){
     if(e.code==='Space'){
       if(!$('ovStart').hidden){e.preventDefault();newGame()}else if(!$('ovRound').hidden){e.preventDefault();startRound()}else if(!$('ovDebrief').hidden&&!$('btnNext').disabled){e.preventDefault();nextFromDebrief()}
-    }else if(e.key.toLowerCase()==='i'&&running){scan()}
+    }
   });
   fit();draw(performance.now());
 })();
